@@ -34,9 +34,9 @@ int estado = START;
 
 int main(int argc, char** argv){
   if (strcmp("0", argv[1])==0)
-    llopen(0, 0);
+    llopen(atoi(argv[2]), 0);
   else if (strcmp("1", argv[1])==0)
-    llopen(4, 1);
+    llopen(atoi(argv[2]), 1);
 }
 
 int llopen(int porta, int flag){
