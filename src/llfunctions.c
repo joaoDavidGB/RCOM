@@ -29,7 +29,7 @@ unsigned char SET2[5];
 
 int fd,c, res;
 //STATES
-enum state {START, FLAG, A_STATE, C, UA, BCC_STATE, STOP};
+enum state {START, FLAG, A_STATE, C, UA, BCC_STATE, STOP2};
 int estado = START;
 
 int main(int argc, char** argv){
@@ -125,7 +125,7 @@ int receberSET(int flag){
     printf("Received: %x !!! %d \n", buf2, res2);
     
     state_machine(estado, buf2);
-    if(estado == STOP){
+    if(estado == STOP2){
       return 1; 
     }
   
@@ -175,7 +175,7 @@ void state_machine(int state, char signal){
         }
         else if (state == BCC_STATE){
                 if (signal == F){
-                        state = STOP;
+                        state = STOP2;
                         SET2[4]=signal;
                 }
                 else
