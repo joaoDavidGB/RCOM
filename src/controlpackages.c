@@ -18,9 +18,9 @@ void send_CONTROL_pck(int arg, int tamanho, char nome){
 
 	/* ENVIO DO TAMANHO DO FICHEIRO (T1) */
 	control = write(fd, t, 1); // enviar o T1
-	control = write(fd, sizeof(&tamanho), 1); // enviar o tamanho em octetos do valor
+	control = write(fd, sizeof(tamanho), 1); // enviar o tamanho em octetos do valor
 	unsigned int i = 0;
-	while(i < sizeof(&tamanho)){ // enviar o V
+	while(i < sizeof(tamanho)){ // enviar o V
 	     control = write(fd, tamanho, sizeof(tamanho));
 	     ++i;
 	}
@@ -47,9 +47,36 @@ void send_DATA(){
 
 }
 
+/* STUFFING */
+void stuffing(unsigned char* frame, unsigned int* size){
+	for (int i = 1; i < (*size-1); i++){
+	    if (frame[i] == 0x7e){
+		frame[i] = 0x7d;
+		memcpy(frame + i+2,frame+i+1,*size-i-1); 
+		frame[i++] = 0x5e;
+		(*size)++;
+	    } 
+	    else if (frame[i] == 0x7d){
+		frame[i] = 0x7d;
+		memcpy(frame + i+2,frame+i+1,*size-i-1); 
+		frame[i++] = 0x5d;
+		(*size)++;
+		}
+	}
+}
+
+/* DESTUFFING */
+void destuffing(unsigned char* frame, unsigned int* size){
+	for(int i = 1; i < (*size-1); ++i){
+		if(frame[i] == 0x7d && frame[i++] == 0x5e){
+		   frame[i] = 0x7e;
+		}
+	}
+}
+
 int main(int argc, char** argv){
 		
     
-    send_CONTROL_pck(1, 1, 'A');
+    //send_CONTROL_pck(1, 1, 'A');
 
 }
