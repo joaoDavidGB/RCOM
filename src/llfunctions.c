@@ -15,11 +15,13 @@
 #define C_SET 0x07
 #define BCC (A^C_SET)
 #define C_UA 0x03
+#define C_DISC 0x0B
 
 int llopen(int porta, int flag);
-void state_machine(int state, char signal);
-int trasmitirSET();
-int receberSET();
+int llclose(int fd);
+void state_machine(int state, char signal, char type);
+int trasmitirSET(int flag, char type);
+int receberSET(int flag, char type);
 
 
 volatile int STOP=FALSE;
@@ -43,7 +45,7 @@ int llopen(int porta, int flag){
   struct termios oldtio,newtio;
 
   char endPorta[20];
-sprintf(endPorta, "/dev/ttyS%d", porta);
+  sprintf(endPorta, "/dev/ttyS%d", porta);
   fd = open(endPorta, O_RDWR | O_NOCTTY);
   if (fd < 0) {perror(endPorta); exit(-1);}
 
@@ -74,15 +76,15 @@ sprintf(endPorta, "/dev/ttyS%d", porta);
   int tentativas = 3;
 
   if (flag == 0){
-    if(receberSET(flag)==1)
-      transmitirSET(flag);
+    if(receberSET(flag, "set")==1)
+      transmitirSET(flag, "ua");
     else
       return -1;
   }
   else{
     while(tentativas > 0){
-      transmitirSET(flag);
-      if (receberSET(flag) != 1)
+      transmitirSET(flag, "set");
+      if (receberSET(flag, "ua") != 1)
         tentativas--;
       else
         break;
@@ -91,16 +93,36 @@ sprintf(endPorta, "/dev/ttyS%d", porta);
 
 
   return fd;
-} 
+}
+
+int llclose(int fd){
+
+    transmitirSET(1, "disc");
+    if (receberSET(1, "disc") == 1);
+      transmitirSET(1, "ua");
+    else
+      return -1;
+
+    sleep(5);
+
+    if ( tcsetattr(fd,TCSANOW,&oldtio) == -1) {
+      perror("tcsetattr");
+      return -1;
+    }
+    close(fd);
+    return 1;
+}
 
 
-int transmitirSET(int flag){
+int transmitirSET(int flag, char type){
   SET[0] = F;
   SET[1] = A;
-  if (flag == 1) 
+  if (type == "set") 
     SET[2] = C_SET;
-  else
+  else if (type == "ua")
     SET[2] = C_UA;
+  else if (type == "disc")
+    SET[2] = C_DISC;
   SET[3] = SET[1]^SET[2];
   SET[4] = F;
 
@@ -115,7 +137,7 @@ int transmitirSET(int flag){
   return 0;
 }
 
-int receberSET(int flag){
+int receberSET(int flag, char type){
   char buf2;
   int res2;
 
@@ -141,8 +163,8 @@ printf("i = %d\n", i);
   return 0;
 }
 
-void state_machine(int state, char signal){
-        printf("estado antes: %d \n", estado);
+void state_machine(int state, char signal, char type){
+       
  
         if (state == START){
                 if (signal == F){
@@ -164,7 +186,9 @@ void state_machine(int state, char signal){
                 if (signal == F){
                         state = FLAG;
                 }
-                else if (signal == C_SET || signal == C_UA){
+                else if ((signal == C_SET && type == "set")
+                  || (signal == C_UA && type == "ua")
+                  || (signal == C_DISC && type == "disc")){
                         state = C;
                         SET2[2]=signal;
                 }
@@ -190,6 +214,6 @@ void state_machine(int state, char signal){
                         state = START;
         }
         estado = state;
-        printf("estado após: %d \n", estado);
        
+        printf("estado: %d \n", estado);
 }
