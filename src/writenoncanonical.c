@@ -28,7 +28,7 @@ enum state {START2, FLAG2, A2, C2,BCC2, STOP2};
 
 int estado = START2; 
 
-int fd, res, control;
+int fd, res;
 int tentativas = 0;
 unsigned char UA[5];
 
@@ -123,47 +123,6 @@ void atende() // atende alarme
 	};
 }
 
-// SEND THE CONTROL PACKAGE
-void send_CONTROL_pck(int arg, int tamanho, char nome){
-    if (arg == 1){ // start package
-	int t = 0;
-	control = write(fd, arg, 1); // enviar o C
-
-	/* ENVIO DO TAMANHO DO FICHEIRO (T1) */
-	control = write(fd, t, 1); // enviar o T1
-	control = write(fd, sizeof(&tamanho), 1); // enviar o tamanho em octetos do valor
-	unsigned int i = 0;
-	while(i < sizeof(&tamanho)){ // enviar o V
-	     control = write(fd, tamanho, sizeof(tamanho));
-	     ++i;
-	}
-
-	printf("Sent: %i as t %i as size %i as size of the file!!", t, sizeof(tamanho), tamanho);
-
-	/* ENVIO DO NOME DO FICHEIRO (T2) */
-	control = write(fd, t++, 1); // enviar o T2
-	control = write(fd, sizeof(nome), 1); // enviar o tamanho do nome do ficheiro
-	int k = 0;
-	while(k < sizeof(nome)){
-		control = write(fd, &nome, sizeof(nome)); // enviar o nome do ficheiro
-		++k;
-	}
-	
-	printf("Sent: t - %i, tamanho do nome - %i, nome - %c", t, sizeof(nome), nome);	
-
-    }
-    else if (arg == 2){ // end package
-	
-    }
-    else{ // error case
-        printf("control package argument invalid");
-    }
-}
-
-void send_DATA(){
-
-}
-
 int main(int argc, char** argv)
 {
     struct termios oldtio,newtio;
@@ -211,23 +170,19 @@ int main(int argc, char** argv)
 	SET[3] = A^C_SET;
 	SET[4] = F;
 
-	//send_SET();
+	send_SET();
 	
-	/*while(!confirmar() && tentativas < 3){
+	while(!confirmar() && tentativas < 3){
 	        alarm(3);
 		tentativas++;
 		send_SET();
-	}*/
+	}
 
 	
 	int i = 0;
-	//flag = TRUE;
+	flag = TRUE;
 
-	//printf("Recieve: 0x%x 0x%x 0x%x 0x%x 0x%x \n", UA[0], UA[1], UA[2], UA[3], UA[4]);
-
-    sleep(5);
-	
-    send_CONTROL_pck(1, 1, A);
+	printf("Recieve: 0x%x 0x%x 0x%x 0x%x 0x%x \n", UA[0], UA[1], UA[2], UA[3], UA[4]);
 
     sleep(5);
 

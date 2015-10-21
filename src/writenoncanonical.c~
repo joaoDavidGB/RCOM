@@ -28,7 +28,7 @@ enum state {START2, FLAG2, A2, C2,BCC2, STOP2};
 
 int estado = START2; 
 
-int fd, res, control;
+int fd, res;
 int tentativas = 0;
 unsigned char UA[5];
 
@@ -121,45 +121,6 @@ void atende() // atende alarme
 	if(!flag){
 		send_SET();
 	};
-}
-
-// SEND THE CONTROL PACKAGE
-void send_CONTROL_pck(int arg, int tamanho, char nome){
-    if (arg == 1){ // start package
-	int t = 0;
-	control = write(fd, arg, 1); // enviar o C
-
-	/* ENVIO DO TAMANHO DO FICHEIRO (T1) */
-	control = write(fd, t, 1); // enviar o T1
-	control = write(fd, sizeof(&tamanho), 1); // enviar o tamanho em octetos do valor
-	unsigned int i = 0;
-	while(i < sizeof(&tamanho)){ // enviar o V
-	     control = write(fd, tamanho, sizeof(tamanho));
-	     ++i;
-	}
-
-	printf("Sent: %i as t %i as size %i as size of the file!!", t, sizeof(tamanho), tamanho);
-
-	/* ENVIO DO NOME DO FICHEIRO (T2) */
-	control = write(fd, t++, 1); // enviar o T2
-	control = write(fd, sizeof(nome), 1); // enviar o tamanho do nome do ficheiro
-	int k = 0;
-	while(k < sizeof(nome)){
-		control = write(fd, &nome, sizeof(nome)); // enviar o nome do ficheiro
-		++k;
-	}
-	
-    }
-    else if (arg == 2){ // end package
-	
-    }
-    else{ // error case
-        printf("control package argument invalid");
-    }
-}
-
-void send_DATA(){
-
 }
 
 int main(int argc, char** argv)
