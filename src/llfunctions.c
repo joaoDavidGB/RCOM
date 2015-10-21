@@ -83,6 +83,8 @@ int llopen(int porta, int flag){
       transmitirSET(flag);
       if (receberSET(flag) != 1)
         tentativas--;
+      else
+        break;
     }
   }
 
