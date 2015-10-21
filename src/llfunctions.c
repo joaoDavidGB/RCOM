@@ -11,7 +11,7 @@
 #define FALSE 0
 #define TRUE 1
 #define F 0x7E
-#define A 0x03
+#define A_ 0x03
 #define C_SET 0x07
 #define BCC (A^C_SET)
 #define C_UA 0x03
@@ -29,7 +29,7 @@ unsigned char SET2[5];
 
 int fd,c, res;
 //STATES
-enum state {START, FLAG, A, C, UA, BCC, STOP};
+enum state {START, FLAG, A_STATE, C, UA, BCC, STOP};
 int estado = START;
 
 int main(int argc, char** argv){
@@ -146,13 +146,13 @@ void state_machine(int state, char signal){
                 if (signal == F)
                         state = FLAG;
                 else if (signal == A){
-                        state = A;
+                        state = A_STATE;
                         SET2[1]=signal;
                 }
                 else
                         state = START;
         }
-        else if (state == A){
+        else if (state == A_STATE){
                 if (signal == F){
                         state = FLAG;
                 }
