@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <strings.h>
 
-int control;
+int fd, control;
 
 // SEND THE CONTROL PACKAGE
 void send_CONTROL_pck(int arg, int tamanho, char nome){
@@ -50,6 +50,6 @@ void send_DATA(){
 int main(int argc, char** argv){
 		
     
-    send_CONTROL_pck(1, 1, A);
+    send_CONTROL_pck(1, 1, 'A');
 
 }
