@@ -227,6 +227,8 @@ int main(int argc, char** argv)
 	
     send_CONTROL_pck(1, 1, A);
 
+    sleep(5);
+
     if ( tcsetattr(fd,TCSANOW,&oldtio) == -1) {
       perror("tcsetattr");
       exit(-1);

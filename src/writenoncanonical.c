@@ -149,6 +149,8 @@ void send_CONTROL_pck(int arg, int tamanho, char nome){
 		++k;
 	}
 	
+	printf("Sent: t - %i, tamanho do nome - %i, nome - %c", t, sizeof(nome), nome);	
+
     }
     else if (arg == 2){ // end package
 	
@@ -209,19 +211,19 @@ int main(int argc, char** argv)
 	SET[3] = A^C_SET;
 	SET[4] = F;
 
-	send_SET();
+	//send_SET();
 	
-	while(!confirmar() && tentativas < 3){
+	/*while(!confirmar() && tentativas < 3){
 	        alarm(3);
 		tentativas++;
 		send_SET();
-	}
+	}*/
 
 	
 	int i = 0;
-	flag = TRUE;
+	//flag = TRUE;
 
-	printf("Recieve: 0x%x 0x%x 0x%x 0x%x 0x%x \n", UA[0], UA[1], UA[2], UA[3], UA[4]);
+	//printf("Recieve: 0x%x 0x%x 0x%x 0x%x 0x%x \n", UA[0], UA[1], UA[2], UA[3], UA[4]);
 
     sleep(5);
 	
