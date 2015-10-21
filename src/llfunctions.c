@@ -10,85 +10,178 @@
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
 #define TRUE 1
-#define FLAG_RCV 0x7E
-#define A_RCV 0x03
-#define C_RCV 0x07
-#define BCC_RCV (A_RCV^C_RCV)
+#define F 0x7E
+#define A 0x03
+#define C_SET 0x07
+#define BCC (A^C_SET)
 #define C_UA 0x03
+
+int llopen(int porta, int flag);
+void state_machine(int state, char signal);
+int trasmitirSET();
+int receberSET();
 
 
 volatile int STOP=FALSE;
 
 unsigned char SET[5];
+unsigned char SET2[5];
 
 int fd,c, res;
 //STATES
+enum state {START, FLAG, A, C, UA, BCC, STOP};
+int estado = START;
 
-int estado;
+int main(int argc, char** argv){
+  if (strcmp("1", argv[1])==0)
+    llopen(0, 1);
+  else if (strcmp("0", argv[1])==0)
+    llopen(4, 0);
+}
 
+int llopen(int porta, int flag){
+  struct termios oldtio,newtio;
 
-		res = write(fd,&SET[i],1); 
+  char * endPorta = "/dev/ttyS" + porta;
+  fd = open(endPorta, O_RDWR | O_NOCTTY);
+  if (fd < 0) {perror(endPorta); exit(-1);}
 
-		res2 = read(fd, &buf2, 1);
+  if ( tcgetattr(fd,&oldtio) == -1) { /* save current port settings */
+    perror("tcgetattr");
+    return -1;
+  }
 
-int llopen(){
+  bzero(&newtio, sizeof(newtio));
 
+  newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
+  newtio.c_iflag = IGNPAR;
+  newtio.c_oflag = OPOST;
 
+  /* set input mode (non-canonical, no echo,...) */
+  newtio.c_lflag = 0;
 
-int main(int argc, char** argv)
-{
-    struct termios oldtio,newtio;
-    char buf[255];
+  newtio.c_cc[VTIME]    = 0;   /* inter-character timer unused */
+  newtio.c_cc[VMIN]     = 0;   /* blocking read until 5 chars received */
 
-    if ( (argc < 2) || 
-  	     ((strcmp("/dev/ttyS0", argv[1])!=0) && 
-  	      (strcmp("/dev/ttyS4", argv[1])!=0) )) {
-      printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
-      exit(1);
+  tcflush(fd, TCIFLUSH);
+
+  if ( tcsetattr(fd,TCSANOW,&newtio) == -1) {
+    perror("tcsetattr");
+    return -1;
+  }
+
+  int tentativas = 3;
+
+  if (flag = 0){
+    if(receberSET(flag)==1)
+      transmitirSET(flag);
+    else
+      return -1;
+  }
+  else{
+    while(tentativas > 0){
+      transmitirSET(flag);
+      if (receberSET(flag) != 1)
+        tentativas--;
     }
-
-  /*
-    Open serial port device for reading and writing and not as controlling tty
-    because we don't want to get killed if linenoise sends CTRL-C.
-  */
-      
-    fd = open(argv[1], O_RDWR | O_NOCTTY );
-    if (fd <0) {perror(argv[1]); exit(-1); }
-
-    tcgetattr(fd,&oldtio); /* save current port settings */
-
-    bzero(&newtio, sizeof(newtio));
-    newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
-    newtio.c_iflag = IGNPAR;
-    newtio.c_oflag = 0;
-
-    /* set input mode (non-canonical, no echo,...) */
-    newtio.c_lflag = 0;
-
-    newtio.c_cc[VTIME]    = 0;   /* inter-character timer unused */
-    newtio.c_cc[VMIN]     = 1;   /* blocking read until 5 chars received */
-
-    tcflush(fd, TCIFLUSH);
-    tcsetattr(fd,TCSANOW,&newtio);
-
-   	printf("New termios structure set\n");
-
-	while(1){
-		if(receber()){
-			send_UA();
-			break;		
-		}
-	}
-
-/*    while (STOP==FALSE) {       /* loop for input */
-/*	res = read(fd,buf,8);   /* returns after 5 chars have been input */
-/*     	buf[res]=0;               /* so we can printf... */
-/*     	if (buf[0]=='z') STOP=TRUE;
-    }*/
+  }
 
 
+  return fd;
+} 
 
-    tcsetattr(fd,TCSANOW,&oldtio);
-    close(fd);
-    return 0;
+
+int transmitirSET(int flag){
+  SET[0] = F;
+  SET[1] = A;
+  if (flag == 1) 
+    SET[2] = C_SET;
+  else
+    SET[2] = C_UA;
+  SET[3] = SET[1]^SET[2];
+  SET[4] = F;
+
+  int i = 0;
+  while(i < 5){
+    res = write(fd,&SET[i],1);  
+    i++;
+  }
+  i=0;
+  printf("Send SET: 0x%x 0x%x 0x%x 0x%x 0x%x \n", SET[0], SET[1], SET[2], SET[3], SET[4]);
+  
+  return 0;
+}
+
+int receberSET(int flag){
+  char buf2;
+  int res2;
+
+  int i = 0;
+  while(i < 5){
+    if (i = 0)
+      while(!(res2 = read(fd, &buf2, 1)) && buf2!=F)
+        continue;
+
+    printf("Received: %x !!! %d \n", buf2, res2);
+    
+    state_machine(estado, buf2);
+    if(estado == STOP){
+      return 1; 
+    }
+  
+  }
+  return 0;
+}
+
+void state_machine(int state, char signal){
+        printf("estado antes: %d \n", estado);
+ 
+        if (state == START){
+                if (signal == F){
+                        state = FLAG;
+                        SET2[0]=signal;
+                }
+        }
+        else if (state == FLAG){
+                if (signal == F)
+                        state = FLAG;
+                else if (signal == A){
+                        state = A;
+                        SET2[1]=signal;
+                }
+                else
+                        state = START;
+        }
+        else if (state == A){
+                if (signal == F){
+                        state = FLAG;
+                }
+                else if (signal == C_SET || signal == C_UA){
+                        state = C;
+                        SET2[2]=signal;
+                }
+                else
+                        state = START;
+        }
+        else if (state == C){
+                if (signal == F)
+                        state = FLAG;
+                else if (signal == (SET2[1]^SET2[2])){
+                        state = BCC;
+                        SET2[3]=signal;
+                }
+                else
+                        state = START;
+        }
+        else if (state == BCC){
+                if (signal == F){
+                        state = STOP;
+                        SET2[4]=signal;
+                }
+                else
+                        state = START;
+        }
+        estado = state;
+        printf("estado após: %d \n", estado);
+       
 }
