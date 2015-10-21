@@ -33,10 +33,10 @@ enum state {START, FLAG, A_STATE, C, UA, BCC_STATE, STOP2};
 int estado = START;
 
 int main(int argc, char** argv){
-  if (strcmp("1", argv[1])==0)
-    llopen(0, 1);
-  else if (strcmp("0", argv[1])==0)
-    llopen(4, 0);
+  if (strcmp("0", argv[1])==0)
+    llopen(0, 0);
+  else if (strcmp("1", argv[1])==0)
+    llopen(4, 1);
 }
 
 int llopen(int porta, int flag){
