@@ -42,7 +42,8 @@ int main(int argc, char** argv){
 int llopen(int porta, int flag){
   struct termios oldtio,newtio;
 
-  char * endPorta = "/dev/ttyS" + porta;
+  char endPorta[20];
+sprintf(endPorta, "/dev/ttyS%d", porta);
   fd = open(endPorta, O_RDWR | O_NOCTTY);
   if (fd < 0) {perror(endPorta); exit(-1);}
 
@@ -72,7 +73,7 @@ int llopen(int porta, int flag){
 
   int tentativas = 3;
 
-  if (flag = 0){
+  if (flag == 0){
     if(receberSET(flag)==1)
       transmitirSET(flag);
     else
@@ -118,11 +119,16 @@ int receberSET(int flag){
 
   int i = 0;
   while(i < 5){
-    if (i = 0)
-      while(!(res2 = read(fd, &buf2, 1)) && buf2!=F)
-        continue;
+    if (i == 0){
+      while((res2 = read(fd, &buf2, 1))==0 && buf2!=F)
+	continue;
+    }
+    else
+	res2 = read(fd, &buf2, 1);
 
     printf("Received: %x !!! %d \n", buf2, res2);
+i++;
+printf("i = %d\n", i);
     
     state_machine(estado, buf2);
     if(estado == STOP2){
