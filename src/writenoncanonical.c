@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <strings.h>
 
 #define BAUDRATE B38400
 #define MODEMDEVICE "/dev/ttyS1"
@@ -27,49 +28,10 @@ enum state {START2, FLAG2, A2, C2,BCC2, STOP2};
 
 int estado = START2; 
 
-int fd, res;
+int fd, res, control;
 int tentativas = 0;
 unsigned char UA[5];
 
-int confirmar(){
-	
-    char buf2;
-    int res2;
-    int ecx=0;
-
-    while(ecx <5){
-	ecx++;
-	while( !(res2 = read(fd, &buf2, 1)) )
-		continue;
-	printf("Received: %x !!! %d \n", buf2, res2);
-	//state_machine(estado, buf2);
-	state_machine(estado, buf2);
-	if(estado == STOP2)
-		return 1;
-	
-   }
-	return 0;
-
-
-}
-
-void atende() // atende alarme
-{
-	if(!flag){
-		send_SET();
-	};
-}
-void send_SET(){
-	int i = 0;
-    while(i < 5){
-	res = write(fd,&SET[i],1);  
-	i++;
-	}
-	i=0;
-	printf("Send: 0x%x 0x%x 0x%x 0x%x 0x%x \n", SET[0], SET[1], SET[2], SET[3], SET[4]);
-}
-
-       
 void state_machine(int state, char signal){
         printf("estado antes: %d \n", estado);
  
@@ -123,6 +85,83 @@ void state_machine(int state, char signal){
        
 }
 
+int confirmar(){
+	
+    char buf2;
+    int res2;
+    int ecx=0;
+
+    while(ecx <5){
+	ecx++;
+	while( !(res2 = read(fd, &buf2, 1)) )
+		continue;
+	printf("Received: %x !!! %d \n", buf2, res2);
+	state_machine(estado, buf2);
+	if(estado == STOP2)
+		return 1;
+	
+   }
+	return 0;
+
+
+}
+
+void send_SET(){
+	int i = 0;
+    while(i < 5){
+	res = write(fd,&SET[i],1);  
+	i++;
+	}
+	i=0;
+	printf("Send: 0x%x 0x%x 0x%x 0x%x 0x%x \n", SET[0], SET[1], SET[2], SET[3], SET[4]);
+}
+
+void atende() // atende alarme
+{
+	if(!flag){
+		send_SET();
+	};
+}
+
+// SEND THE CONTROL PACKAGE
+void send_CONTROL_pck(int arg, int tamanho, char nome){
+    if (arg == 1){ // start package
+	int t = 0;
+	control = write(fd, arg, 1); // enviar o C
+
+	/* ENVIO DO TAMANHO DO FICHEIRO (T1) */
+	control = write(fd, t, 1); // enviar o T1
+	control = write(fd, sizeof(&tamanho), 1); // enviar o tamanho em octetos do valor
+	unsigned int i = 0;
+	while(i < sizeof(&tamanho)){ // enviar o V
+	     control = write(fd, tamanho, sizeof(tamanho));
+	     ++i;
+	}
+
+	printf("Sent: %i as t %i as size %i as size of the file!!", t, sizeof(tamanho), tamanho);
+
+	/* ENVIO DO NOME DO FICHEIRO (T2) */
+	control = write(fd, t++, 1); // enviar o T2
+	control = write(fd, sizeof(nome), 1); // enviar o tamanho do nome do ficheiro
+	int k = 0;
+	while(k < sizeof(nome)){
+		control = write(fd, &nome, sizeof(nome)); // enviar o nome do ficheiro
+		++k;
+	}
+	
+    }
+    else if (arg == 2){ // end package
+	
+    }
+    else{ // error case
+        printf("control package argument invalid");
+    }
+}
+
+void send_DATA(){
+
+}
+
 int main(int argc, char** argv)
 {
     struct termios oldtio,newtio;
@@ -173,20 +212,23 @@ int main(int argc, char** argv)
 	send_SET();
 	
 	while(!confirmar() && tentativas < 3){
-		alarm(3);
+	        alarm(3);
 		tentativas++;
 		send_SET();
 	}
 
 	
 	int i = 0;
-
-
 	flag = TRUE;
 
 	printf("Recieve: 0x%x 0x%x 0x%x 0x%x 0x%x \n", UA[0], UA[1], UA[2], UA[3], UA[4]);
 
     sleep(5);
+	
+    send_CONTROL_pck(1, 1, A);
+
+    sleep(5);
+
     if ( tcsetattr(fd,TCSANOW,&oldtio) == -1) {
       perror("tcsetattr");
       exit(-1);
