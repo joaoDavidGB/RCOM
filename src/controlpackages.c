@@ -58,7 +58,7 @@ void stuffing(unsigned char* frame, unsigned int* size){
 	    } 
 	    else if (frame[i] == 0x7d){
 		frame[i] = 0x7d;
-		memcpy(frame + i+2,frame+i+1,*size-i-1); 
+		memcpy(frame + i + 2,frame + i + 1,*size-i-1); 
 		frame[i++] = 0x5d;
 		(*size)++;
 		}
@@ -70,6 +70,11 @@ void destuffing(unsigned char* frame, unsigned int* size){
 	for(int i = 1; i < (*size-1); ++i){
 		if(frame[i] == 0x7d && frame[i++] == 0x5e){
 		   frame[i] = 0x7e;
+		   memcpy(frame + i + 1, frame + i + 2, *size-i-1);
+		}
+		else if (frame[i] == 0x7d && frame[i++]== 0x5d){
+			frame[i] = 0x7d;
+			memcpy(frame + i + 1, frame + i + 2, *size-i-1);
 		}
 	}
 }
