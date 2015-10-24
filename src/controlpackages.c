@@ -71,10 +71,12 @@ void destuffing(unsigned char* frame, unsigned int* size){
 		if(frame[i] == 0x7d && frame[i++] == 0x5e){
 		   frame[i] = 0x7e;
 		   memcpy(frame + i + 1, frame + i + 2, *size-i-1);
+		   (*size--);
 		}
 		else if (frame[i] == 0x7d && frame[i++]== 0x5d){
 			frame[i] = 0x7d;
 			memcpy(frame + i + 1, frame + i + 2, *size-i-1);
+			(*size--);
 		}
 	}
 }
