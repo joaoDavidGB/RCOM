@@ -132,7 +132,7 @@ int llclose_receiver(int fd){
 
     if (receberSET(1, "disc") == 1){
       transmitirSET(1, "disc");
-      if (receberSET(1, "ua") == 1){
+      if (receberSET(1, "ua") != 1){
         return -1;
       }
     }
