@@ -17,13 +17,13 @@
 #define C_UA 0x03
 #define C_DISC 0x0B
 
-struct info {
+struct Info {
   int fd;
   struct termios oldtio;
   struct termios newtio;
   char endPorta[20];
 
-}
+}info;
 
 
 int llopen(int porta, int flag);
