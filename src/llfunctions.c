@@ -21,8 +21,8 @@
 int llopen(int porta, int flag);
 int llclose(int fd);
 void state_machine(int state, char signal, char type);
-int trasmitirSET(int flag, char type);
-int receberSET(int flag, char type);
+int trasmitirSET(int flag, char * type);
+int receberSET(int flag, char * type);
 
 
 volatile int STOP=FALSE;
@@ -139,7 +139,7 @@ int llclose_receiver(int fd){
 }
 
 
-int transmitirSET(int flag, char type){
+int transmitirSET(int flag, char * type){
   SET[0] = F;
   SET[1] = A;
   if (type == "set") 
@@ -162,7 +162,7 @@ int transmitirSET(int flag, char type){
   return 0;
 }
 
-int receberSET(int flag, char type){
+int receberSET(int flag, char * type){
   char buf2;
   int res2;
 
