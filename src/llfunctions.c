@@ -18,8 +18,8 @@
 #define C_DISC 0x0B
 
 struct Info {
-  int fd;
-  struct termios oldtio;
+  int fd; // descritor de ficheiro
+  struct termios oldtio; //
   struct termios newtio;
   char endPorta[20];
 
@@ -28,7 +28,7 @@ struct Info {
 
 int llopen(int porta, int flag);
 int llclose(int fd);
-void state_machine(int state, char signal, char type);
+void state_machine(int state, char signal, char * type);
 int trasmitirSET(int flag, char * type);
 int receberSET(int flag, char * type);
 
@@ -45,6 +45,7 @@ enum state {START, FLAG, A_STATE, C, UA, BCC_STATE, STOP2};
 int estado = START;
 
 int main(int argc, char** argv){
+  info = malloc(sizeof(struct Info));
   if (strcmp("0", argv[1])==0)
     llopen(atoi(argv[2]), 0);
   else if (strcmp("1", argv[1])==0)
@@ -55,28 +56,28 @@ int llopen(int porta, int flag){
 
   sprintf(info->endPorta, "/dev/ttyS%d", porta);
   info->fd = open(info->endPorta, O_RDWR | O_NOCTTY);
-  if (info->fd < 0) {perror(endPorta); exit(-1);}
+  if (info->fd < 0) {perror(info->endPorta); exit(-1);}
 
-  if ( tcgetattr(fd,&oldtio) == -1) { /* save current port settings */
+  if ( tcgetattr(info->fd,&info->oldtio) == -1) { // save current port settings 
     perror("tcgetattr");
     return -1;
   }
 
-  bzero(&newtio, sizeof(newtio));
+  bzero(&info->newtio, sizeof(info->newtio));
 
-  newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
-  newtio.c_iflag = IGNPAR;
-  newtio.c_oflag = OPOST;
+  info->newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
+  info->newtio.c_iflag = IGNPAR;
+  info->newtio.c_oflag = OPOST;
 
-  /* set input mode (non-canonical, no echo,...) */
-  newtio.c_lflag = 0;
+  // set input mode (non-canonical, no echo,...) 
+  info->newtio.c_lflag = 0;
 
-  newtio.c_cc[VTIME]    = 0;   /* inter-character timer unused */
-  newtio.c_cc[VMIN]     = 0;   /* blocking read until 5 chars received */
+  info->newtio.c_cc[VTIME]    = 0;   // inter-character timer unused 
+  info->newtio.c_cc[VMIN]     = 0;   // blocking read until 5 chars received 
 
-  tcflush(fd, TCIFLUSH);
+  tcflush(info->fd, TCIFLUSH);
 
-  if ( tcsetattr(fd,TCSANOW,&newtio) == -1) {
+  if ( tcsetattr(info->fd,TCSANOW,&info->newtio) == -1) {
     perror("tcsetattr");
     return -1;
   }
@@ -101,9 +102,8 @@ int llopen(int porta, int flag){
       }
     }
   }
-
-
-  return fd;
+  
+  return info->fd;
 }
 
 int llclose_transmitter(int fd){
@@ -116,7 +116,7 @@ int llclose_transmitter(int fd){
 
     sleep(5);
 
-    if ( tcsetattr(fd,TCSANOW,&oldtio) == -1) {
+    if ( tcsetattr(info->fd,TCSANOW,&info->oldtio) == -1) {
       perror("tcsetattr");
       return -1;
     }
@@ -137,7 +137,7 @@ int llclose_receiver(int fd){
 
     sleep(5);
 
-    if ( tcsetattr(fd,TCSANOW,&oldtio) == -1) {
+    if ( tcsetattr(info->fd,TCSANOW,&info->oldtio) == -1) {
       perror("tcsetattr");
       return -1;
     }
@@ -160,7 +160,7 @@ int transmitirSET(int flag, char * type){
 
   int i = 0;
   while(i < 5){
-    res = write(fd,&SET[i],1);  
+    res = write(info->fd,&SET[i],1);  
     i++;
   }
   i=0;
@@ -176,17 +176,17 @@ int receberSET(int flag, char * type){
   int i = 0;
   while(i < 5){
     if (i == 0){
-      while((res2 = read(fd, &buf2, 1))==0 && buf2!=F)
+      while((res2 = read(info->fd, &buf2, 1))==0 && buf2!=F)
 	     continue;
     }
     else
-	    res2 = read(fd, &buf2, 1);
+	    res2 = read(info->fd, &buf2, 1);
 
     printf("Received: %x !!! %d \n", buf2, res2);
     i++;
     printf("i = %d\n", i);
     
-    state_machine(estado, buf2);
+    state_machine(estado, buf2, type);
     if(estado == STOP2){
       return 1; 
     }
@@ -195,7 +195,7 @@ int receberSET(int flag, char * type){
   return 0;
 }
 
-void state_machine(int state, char signal, char type){
+void state_machine(int state, char signal, char * type){
        
  
         if (state == START){
