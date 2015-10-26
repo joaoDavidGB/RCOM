@@ -89,6 +89,8 @@ int llopen(int porta, int flag){
       transmitirSET(flag, "ua");
     else
       return -1;
+
+    llclose_receiver(info->fd);
   }
   else{
     while(tentativas > 0){
@@ -101,6 +103,7 @@ int llopen(int porta, int flag){
         break;
       }
     }
+    llclose_transmitter(info->fd);
   }
   
   return info->fd;
@@ -121,6 +124,7 @@ int llclose_transmitter(int fd){
       return -1;
     }
     close(fd);
+    printf("fechou \n")
     return 1;
 }
 
@@ -142,6 +146,7 @@ int llclose_receiver(int fd){
       return -1;
     }
     close(fd);
+    printf("fechou \n")
     return 1;
 }
 
