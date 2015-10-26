@@ -23,7 +23,7 @@ struct Info {
   struct termios newtio;
   char endPorta[20];
 
-}info;
+};
 
 
 int llopen(int porta, int flag);
@@ -38,6 +38,7 @@ volatile int STOP=FALSE;
 unsigned char SET[5];
 unsigned char SET2[5];
 
+struct Info * info;
 int c, res;
 //STATES
 enum state {START, FLAG, A_STATE, C, UA, BCC_STATE, STOP2};
@@ -52,7 +53,7 @@ int main(int argc, char** argv){
 
 int llopen(int porta, int flag){
 
-  sprintf(info.endPorta, "/dev/ttyS%d", porta);
+  sprintf(info->endPorta, "/dev/ttyS%d", porta);
   info->fd = open(info->endPorta, O_RDWR | O_NOCTTY);
   if (info->fd < 0) {perror(endPorta); exit(-1);}
 
