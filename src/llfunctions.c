@@ -17,6 +17,14 @@
 #define C_UA 0x03
 #define C_DISC 0x0B
 
+struct info {
+  int fd;
+  struct termios oldtio;
+  struct termios newtio;
+  char endPorta[20];
+
+}
+
 
 int llopen(int porta, int flag);
 int llclose(int fd);
@@ -30,7 +38,7 @@ volatile int STOP=FALSE;
 unsigned char SET[5];
 unsigned char SET2[5];
 
-int fd,c, res;
+int c, res;
 //STATES
 enum state {START, FLAG, A_STATE, C, UA, BCC_STATE, STOP2};
 int estado = START;
@@ -43,12 +51,10 @@ int main(int argc, char** argv){
 }
 
 int llopen(int porta, int flag){
-  struct termios oldtio,newtio;
 
-  char endPorta[20];
-  sprintf(endPorta, "/dev/ttyS%d", porta);
-  fd = open(endPorta, O_RDWR | O_NOCTTY);
-  if (fd < 0) {perror(endPorta); exit(-1);}
+  sprintf(info->endPorta, "/dev/ttyS%d", porta);
+  info->fd = open(info->endPorta, O_RDWR | O_NOCTTY);
+  if (info->fd < 0) {perror(endPorta); exit(-1);}
 
   if ( tcgetattr(fd,&oldtio) == -1) { /* save current port settings */
     perror("tcgetattr");
