@@ -124,7 +124,7 @@ int llclose_transmitter(int fd){
       return -1;
     }
     close(fd);
-    printf("fechou \n")
+    printf("fechou transmissor\n");
     return 1;
 }
 
@@ -146,7 +146,7 @@ int llclose_receiver(int fd){
       return -1;
     }
     close(fd);
-    printf("fechou \n")
+    printf("fechou recetor\n");
     return 1;
 }
 
