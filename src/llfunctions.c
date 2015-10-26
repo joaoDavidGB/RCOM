@@ -177,7 +177,7 @@ int transmitirSET(int flag, char * type){
 int receberSET(int flag, char * type){
   char buf2;
   int res2;
-
+  estado = START;
   int i = 0;
   while(i < 5){
     if (i == 0){
@@ -193,6 +193,7 @@ int receberSET(int flag, char * type){
     
     state_machine(estado, buf2, type);
     if(estado == STOP2){
+      estado = START;
       return 1; 
     }
   
