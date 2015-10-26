@@ -17,6 +17,7 @@
 #define C_UA 0x03
 #define C_DISC 0x0B
 
+
 int llopen(int porta, int flag);
 int llclose(int fd);
 void state_machine(int state, char signal, char type);
@@ -84,10 +85,13 @@ int llopen(int porta, int flag){
   else{
     while(tentativas > 0){
       transmitirSET(flag, "set");
+      alarm(3);
       if (receberSET(flag, "ua") != 1)
         tentativas--;
-      else
+      else{
+        alarm(0);
         break;
+      }
     }
   }
 
@@ -95,11 +99,32 @@ int llopen(int porta, int flag){
   return fd;
 }
 
-int llclose(int fd){
+int llclose_transmitter(int fd){
 
     transmitirSET(1, "disc");
-    if (receberSET(1, "disc") == 1);
+    if (receberSET(1, "disc") == 1)
       transmitirSET(1, "ua");
+    else
+      return -1;
+
+    sleep(5);
+
+    if ( tcsetattr(fd,TCSANOW,&oldtio) == -1) {
+      perror("tcsetattr");
+      return -1;
+    }
+    close(fd);
+    return 1;
+}
+
+int llclose_receiver(int fd){
+
+    if (receberSET(1, "disc") == 1){
+      transmitirSET(1, "disc");
+      if (receberSET(1, "ua") == 1){
+        return -1;
+      }
+    }
     else
       return -1;
 
@@ -145,14 +170,14 @@ int receberSET(int flag, char type){
   while(i < 5){
     if (i == 0){
       while((res2 = read(fd, &buf2, 1))==0 && buf2!=F)
-	continue;
+	     continue;
     }
     else
-	res2 = read(fd, &buf2, 1);
+	    res2 = read(fd, &buf2, 1);
 
     printf("Received: %x !!! %d \n", buf2, res2);
-i++;
-printf("i = %d\n", i);
+    i++;
+    printf("i = %d\n", i);
     
     state_machine(estado, buf2);
     if(estado == STOP2){
@@ -217,3 +242,4 @@ void state_machine(int state, char signal, char type){
        
         printf("estado: %d \n", estado);
 }
+
