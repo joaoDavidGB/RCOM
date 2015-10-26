@@ -169,7 +169,7 @@ int transmitirSET(int flag, char * type){
     i++;
   }
   i=0;
-  printf("Send SET: 0x%x 0x%x 0x%x 0x%x 0x%x \n", SET[0], SET[1], SET[2], SET[3], SET[4]);
+  printf("Send %s: 0x%x 0x%x 0x%x 0x%x 0x%x \n", type, SET[0], SET[1], SET[2], SET[3], SET[4]);
   
   return 0;
 }
