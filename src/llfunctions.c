@@ -52,7 +52,7 @@ int main(int argc, char** argv){
 
 int llopen(int porta, int flag){
 
-  sprintf(info->endPorta, "/dev/ttyS%d", porta);
+  sprintf(info.endPorta, "/dev/ttyS%d", porta);
   info->fd = open(info->endPorta, O_RDWR | O_NOCTTY);
   if (info->fd < 0) {perror(endPorta); exit(-1);}
 
