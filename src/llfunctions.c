@@ -365,6 +365,7 @@ int llwrite(int fd, char * buffer, int length){
 int llread(int fd, char * buffer){
   char * tramaI;
   tramaI = receberI(RECEIVER);
+  printf("I: %s \n", tramaI);
   if (tramaI == "fail"){
     //enviar frame REJ
     printf("falhou a receber a I: %s \n", tramaI);
