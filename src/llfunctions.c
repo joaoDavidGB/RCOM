@@ -35,7 +35,8 @@ struct Info {
   unsigned int timeout; /*Valor do temporizador: 1 s*/
   unsigned int numTransmissions; /*Número de tentativas em caso de falha*/
   
-  char frame[255]; /*Trama*/
+  char * dados; /*dados a enviar/receber*/
+  int lengthDados;
 
 };
 
@@ -89,7 +90,10 @@ int main(int argc, char** argv){
     teste[2] = 0x05;
     sleep(1);
     printf("llwrite de %x, %x, %x \n", teste[0], teste[1], teste[2]);
-    llwrite(info->fd, teste, 3);
+    strcpy(info->dados, teste);
+    printf("info->dados[0] = %x\n", info->dados[0]);
+    info->lengthDados = 3;
+    llwrite(info->fd, info->dados, info->lengthDados);
     printf("INICIAR LLCLOSE\n");
     llclose_transmitter(info->fd);
   }
@@ -247,8 +251,8 @@ int receberSET(int flag, char * type){
 }
 
 char * receberI(int flag){
-  char * dados;
-  dados = malloc(sizeof(255));
+  //char * dados;
+  //dados = malloc(sizeof(255));
   char buf2 = 0;
   int res2;
   int i;
@@ -281,7 +285,7 @@ char * receberI(int flag){
     if (BBC2 == buf2)
       break;
     BBC2 = BBC2^buf2;
-    dados[i] = buf2;
+    info->dados[i] = buf2;
     if (i == 0)
       buf2 = 1;
     i++;
@@ -290,10 +294,10 @@ char * receberI(int flag){
   printf("acabaram os dados\n");
   while((res2 = read(info->fd, &buf2, 1))==0)
     continue;
-  state_machine(estado, buf2, "I");
+  //state_machine(estado, buf2, "I");
   if (estado == STOP2){
     printf("recebeu a trama I corretamente\n");
-    return dados;
+    return info->dados;
   }
   else
     return "fail";
@@ -362,35 +366,41 @@ void state_machine(int state, char signal, char * type){
 int llwrite(int fd, char * buffer, int length){
   char * tramaI;
   //strcpy(tramaI, comporTramaI(TRANSMITTER, buffer, length));
-  tramaI = comporTramaI(TRANSMITTER, buffer, length);
+  tramaI = comporTramaI(TRANSMITTER, buffer, info->lengthDados);
   printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
   transmitirFrame(tramaI, 6+length);
   alarm(3);
   free(tramaI);
   if (info->sequenceNumber == 1){
-    if (receberSET(TRANSMITTER, "rr1"))
+    if (receberSET(TRANSMITTER, "rr1")){
+      printf("recebeu rr corretamente \n");
       alarm(0);
+    }
   }
   else if (info->sequenceNumber == 0){
-    if (receberSET(TRANSMITTER, "rr0"))
+    if (receberSET(TRANSMITTER, "rr0")){
+      printf("recebeu rr corretamente \n");
       alarm(0);
+    }
   }
+  printf("retornar llwrite\n");
   return 1;
 }
 
 int llread(int fd, char * buffer){
-  char * dados;
-  dados = receberI(RECEIVER);
-  printf("Dados recebidos: %x, %x, %x \n", dados[0],dados[1],dados[2]);
-  if (dados == "fail"){
+  //char * dados;
+  //dados = receberI(RECEIVER);
+  receberI(RECEIVER);
+  printf("Dados recebidos: %x, %x, %x \n", info->dados[0],info->dados[1],info->dados[2]);
+  if (info->dados == "fail"){
     //enviar frame REJ
-    printf("falhou a receber a I: %s \n", dados);
+    printf("falhou a receber a I: %s \n", info->dados);
     return 0;
   }
-  printf("tramaI: %s \n", dados);
-  buffer = dados;
+  buffer = info->dados;
   char * rrtype;
   sprintf(rrtype, "rr%d", info->sequenceNumber+1);
+  printf("enviar %s\n", rrtype);
   transmitirSET(RECEIVER, rrtype);
   return 1;
 }
@@ -458,7 +468,7 @@ void stuffing(unsigned char* frame, unsigned int* size){
 */
 int transmitirFrame(char * frame, int length){
   int i;
-  printf("Enviar frame tamanho %d : ", length);
+  fprintf(stderr, "Enviar frame tamanho %d : ", length);
   for(i = 0; i < length; i++){
     res = write(info->fd,&frame[i],1);
     printf("0x%x ", frame[i]);
