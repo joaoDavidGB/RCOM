@@ -260,7 +260,7 @@ char * receberI(int flag){
        continue;
    }
 
-     printf("ReceivedI: %x !!! %d \n", buf2, res2);
+     printf("ReceivedI[%d]: %x !!! %d \n", i, buf2, res2);
      state_machine(estado, buf2, "I");
   }
   if (estado != BCC_STATE)
@@ -318,7 +318,7 @@ void state_machine(int state, char signal, char * type){
                   || (signal == C_DISC && type == "disc")
                   || (signal == RR(0) && type == "rr1")
                   || (signal == RR(1) && type == "rr0")
-                  || (info->sequenceNumber && type == "I")){
+                  || (signal == info->sequenceNumber && type == "I")){
                         state = C;
                         SET2[2]=signal;
                 }
@@ -352,7 +352,6 @@ int llwrite(int fd, char * buffer, int length){
   char * tramaI;
   //strcpy(tramaI, comporTramaI(TRANSMITTER, buffer, length));
   tramaI = comporTramaI(TRANSMITTER, buffer, length);
-  printf("tramaI para envio: %s \n", tramaI);
   printf("partes: %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3]);
   transmitirFrame(tramaI, length);
   alarm(3);
