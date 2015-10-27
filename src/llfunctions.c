@@ -73,6 +73,7 @@ int estado = START;
 int main(int argc, char** argv){
   info = malloc(sizeof(struct Info));
   info->sequenceNumber = 0;
+  info->dados = malloc(255);
   printf("sequenceNumber: %d \n", info->sequenceNumber);
   if (strcmp("0", argv[1])==0){
     llopen(atoi(argv[2]), RECEIVER);
@@ -84,14 +85,13 @@ int main(int argc, char** argv){
   }
   else if (strcmp("1", argv[1])==0){
     llopen(atoi(argv[2]), TRANSMITTER);
-    char * teste;
-    teste[0] = 0x11;
-    teste[1] = 0x22;
-    teste[2] = 0x05;
+    printf("cenas\n");
+    info->dados[0] = 0x11;
+    printf("cenas\n");
+    info->dados[1] = 0x22;
+    info->dados[2] = 0x05;
     sleep(1);
-    printf("llwrite de %x, %x, %x \n", teste[0], teste[1], teste[2]);
-    strcpy(info->dados, teste);
-    printf("info->dados[0] = %x\n", info->dados[0]);
+    printf("llwrite de %x, %x, %x \n", info->dados[0], info->dados[1], info->dados[2]);
     info->lengthDados = 3;
     llwrite(info->fd, info->dados, info->lengthDados);
     printf("INICIAR LLCLOSE\n");
@@ -278,10 +278,10 @@ char * receberI(int flag){
   i = 0;
   buf2 = 1;
   while(BBC2 != buf2){
-    printf("BBC2=%x -- buf2=%x \n", BBC2, buf2);
     while((res2 = read(info->fd, &buf2, 1))==0)
       continue;
     printf("ReceivedDados[%d]: %x !!! %d \n", i, buf2, res2);
+    printf("BBC2=%x -- buf2=%x \n", BBC2, buf2);
     if (BBC2 == buf2)
       break;
     BBC2 = BBC2^buf2;
@@ -471,9 +471,9 @@ int transmitirFrame(char * frame, int length){
   fprintf(stderr, "Enviar frame tamanho %d : ", length);
   for(i = 0; i < length; i++){
     res = write(info->fd,&frame[i],1);
-    printf("0x%x ", frame[i]);
+    fprintf(stderr,"0x%x ", frame[i]);
   }
-  printf("/n");
+  fprintf(stderr,"/n");
 }
 
 int RR(int N){
