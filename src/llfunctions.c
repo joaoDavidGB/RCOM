@@ -66,7 +66,7 @@ unsigned char SET2[5];
 struct Info * info;
 int c, res;
 //STATES
-enum state {START, FLAG, A_STATE, C, UA, BCC_STATE, STOP2};
+enum state {START, FLAG, A_STATE, C, BCC_STATE, STOP2};
 int estado = START;
 
 int main(int argc, char** argv){
@@ -246,6 +246,7 @@ int receberSET(int flag, char * type){
 
 char * receberI(int flag){
   char * dados;
+  dados = malloc(sizeof(255));
   char buf2 = 0;
   int res2;
   int i;
@@ -266,12 +267,14 @@ char * receberI(int flag){
   if (estado != BCC_STATE)
     return "fail";
 
+  printf("nao falhou na receçao dos primeiros do I\n");
   char BBC2 = 0;
   i = 0;
   buf2 = 1;
   while(BBC2 != buf2){
     while((res2 = read(info->fd, &buf2, 1))==0)
       continue;
+    printf("ReceivedDados[%d]: %x !!! %d \n", i, buf2, res2);
     BBC2 = BBC2^buf2;
     dados[i] = buf2;
     if (i == 0)
