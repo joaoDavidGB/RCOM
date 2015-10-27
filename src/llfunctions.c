@@ -278,6 +278,8 @@ char * receberI(int flag){
     while((res2 = read(info->fd, &buf2, 1))==0)
       continue;
     printf("ReceivedDados[%d]: %x !!! %d \n", i, buf2, res2);
+    if (BBC2 == buf2)
+      break;
     BBC2 = BBC2^buf2;
     dados[i] = buf2;
     if (i == 0)
