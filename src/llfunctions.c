@@ -175,7 +175,7 @@ int transmitirSET(int flag, char * type){
 }
 
 int receberSET(int flag, char * type){
-  char buf2;
+  char buf2 = 0;
   int res2;
   estado = START;
   int i = 0;
