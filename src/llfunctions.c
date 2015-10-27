@@ -301,7 +301,7 @@ void state_machine(int state, char signal, char * type){
         else if (state == FLAG){
                 if (signal == F)
                         state = FLAG;
-                else if ((signal == A)
+                else if ((signal == A && type != "I")
                   || (signal == campo_endereco(flag, info->sequenceNumber) && type == "I")){
                         state = A_STATE;
                         SET2[1]=signal;
