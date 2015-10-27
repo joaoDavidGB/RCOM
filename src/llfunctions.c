@@ -86,7 +86,7 @@ int main(int argc, char** argv){
     teste[1] = 0x22;
     teste[2] = 0x05;
     sleep(3);
-    printf("llwrite de %s \n", teste);
+    printf("llwrite de %x, %x, %x \n", teste[0], teste[1], teste[2]);
     llwrite(info->fd, teste, 3);
     llclose_transmitter(info->fd);
   }
@@ -349,10 +349,13 @@ void state_machine(int state, char signal, char * type){
 
 int llwrite(int fd, char * buffer, int length){
   char * tramaI;
-  strcpy(tramaI, comporTramaI(TRANSMITTER, buffer, length));
+  //strcpy(tramaI, comporTramaI(TRANSMITTER, buffer, length));
+  tramaI = comporTramaI(TRANSMITTER, buffer, length);
   printf("tramaI para envio: %s \n", tramaI);
+  printf("partes: %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3]);
   transmitirFrame(tramaI, length);
   alarm(3);
+  free(tramaI);
   if (info->sequenceNumber == 1){
     if (receberSET(TRANSMITTER, "rr1"))
       alarm(0);
@@ -383,6 +386,7 @@ int llread(int fd, char * buffer){
 
 char * comporTramaI(int flag, char * buffer, int length){
   char * trama;
+  trama = malloc(sizeof(5 + length));
   int index;
   trama[0] = F;
   trama[1] = campo_endereco(flag, info->sequenceNumber);
@@ -398,6 +402,11 @@ char * comporTramaI(int flag, char * buffer, int length){
   }
   trama[4 + length + 1] = F;
 
+  int i;
+  for(i = 0; i <= (5+length); i++){
+    printf("I[%d]=%x ", i, trama[i]);
+  }
+  printf("\n");
   return trama;
 }
 
