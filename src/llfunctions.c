@@ -72,6 +72,7 @@ int estado = START;
 int main(int argc, char** argv){
   info = malloc(sizeof(struct Info));
   info->sequenceNumber = 0;
+  printf("sequenceNumber: %d \n", info->sequenceNumber);
   if (strcmp("0", argv[1])==0){
     llopen(atoi(argv[2]), RECEIVER);
     char * result;
