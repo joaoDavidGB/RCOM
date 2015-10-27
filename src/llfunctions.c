@@ -87,7 +87,7 @@ int main(int argc, char** argv){
     teste[0] = 0x11;
     teste[1] = 0x22;
     teste[2] = 0x05;
-    sleep(3);
+    sleep(1);
     printf("llwrite de %x, %x, %x \n", teste[0], teste[1], teste[2]);
     llwrite(info->fd, teste, 3);
     printf("INICIAR LLCLOSE\n");
@@ -291,7 +291,6 @@ char * receberI(int flag){
   while((res2 = read(info->fd, &buf2, 1))==0)
     continue;
   state_machine(estado, buf2, "I");
-  printf("printf de localização\n");
   if (estado == STOP2){
     printf("recebeu a trama I corretamente\n");
     return dados;
@@ -365,7 +364,7 @@ int llwrite(int fd, char * buffer, int length){
   //strcpy(tramaI, comporTramaI(TRANSMITTER, buffer, length));
   tramaI = comporTramaI(TRANSMITTER, buffer, length);
   printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
-  transmitirFrame(tramaI, 5+length);
+  transmitirFrame(tramaI, 6+length);
   alarm(3);
   free(tramaI);
   if (info->sequenceNumber == 1){
@@ -376,20 +375,20 @@ int llwrite(int fd, char * buffer, int length){
     if (receberSET(TRANSMITTER, "rr0"))
       alarm(0);
   }
-
+  return 1;
 }
 
 int llread(int fd, char * buffer){
-  char * tramaI;
-  tramaI = receberI(RECEIVER);
-  printf("I: %s \n", tramaI);
-  if (tramaI == "fail"){
+  char * dados;
+  dados = receberI(RECEIVER);
+  printf("Dados recebidos: %x, %x, %x \n", dados[0],dados[1],dados[2]);
+  if (dados == "fail"){
     //enviar frame REJ
-    printf("falhou a receber a I: %s \n", tramaI);
+    printf("falhou a receber a I: %s \n", dados);
     return 0;
   }
-  printf("tramaI: %s \n", tramaI);
-  buffer = tramaI;
+  printf("tramaI: %s \n", dados);
+  buffer = dados;
   char * rrtype;
   sprintf(rrtype, "rr%d", info->sequenceNumber+1);
   transmitirSET(RECEIVER, rrtype);
@@ -459,10 +458,10 @@ void stuffing(unsigned char* frame, unsigned int* size){
 */
 int transmitirFrame(char * frame, int length){
   int i;
-  printf("Enviar frame: ");
+  printf("Enviar frame tamanho %d : ", length);
   for(i = 0; i < length; i++){
     res = write(info->fd,&frame[i],1);
-    printf("0x%x", frame[i]);
+    printf("0x%x ", frame[i]);
   }
   printf("/n");
 }
