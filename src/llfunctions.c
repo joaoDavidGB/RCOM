@@ -291,6 +291,7 @@ char * receberI(int flag){
   while((res2 = read(info->fd, &buf2, 1))==0)
     continue;
   state_machine(estado, buf2, "I");
+  printf("printf de localização\n");
   if (estado == STOP2){
     printf("recebeu a trama I corretamente\n");
     return dados;
@@ -363,7 +364,7 @@ int llwrite(int fd, char * buffer, int length){
   char * tramaI;
   //strcpy(tramaI, comporTramaI(TRANSMITTER, buffer, length));
   tramaI = comporTramaI(TRANSMITTER, buffer, length);
-  printf("partes: %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3]);
+  printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],trama[8]);
   transmitirFrame(tramaI, 5+length);
   alarm(3);
   free(tramaI);
