@@ -61,10 +61,23 @@ int estado = START;
 
 int main(int argc, char** argv){
   info = malloc(sizeof(struct Info));
-  if (strcmp("0", argv[1])==0)
+  info->sequenceNumber = 0;
+  if (strcmp("0", argv[1])==0){
     llopen(atoi(argv[2]), RECEIVER);
-  else if (strcmp("1", argv[1])==0)
+    char * teste;
+    teste[0] = 0x11;
+    teste[1] = 0x22;
+    teste[2] = 0x05;
+    llwrite(info->fd, teste, 3);
+    llclose_receiver(info->fd);
+  }
+  else if (strcmp("1", argv[1])==0){
     llopen(atoi(argv[2]), TRANSMITTER);
+    char * result;
+    llread(info->fd, result);
+    printf("Result: %s /n", result);
+    llclose_transmitter(info->fd);
+  }
 }
 
 int llopen(int porta, int flag){
@@ -105,7 +118,7 @@ int llopen(int porta, int flag){
     else
       return -1;
 
-    llclose_receiver(info->fd);
+    //llclose_receiver(info->fd);
   }
   else{
     while(tentativas > 0){
@@ -118,7 +131,7 @@ int llopen(int porta, int flag){
         break;
       }
     }
-    llclose_transmitter(info->fd);
+    //llclose_transmitter(info->fd);
   }
   
   return info->fd;
@@ -218,7 +231,7 @@ int receberSET(int flag, char * type){
   return 0;
 }
 
-int receberI(int flag){
+char * receberI(int flag){
   char * dados;
   char buf2 = 0;
   int res2;
@@ -237,15 +250,28 @@ int receberI(int flag){
      state_machine(estado, buf2, "I");
   }
   if (estado != BCC_STATE)
-    return 0;
+    return "fail";
 
   char BBC2 = 0;
+  i = 0;
+  buf2 = 1;
   while(BBC2 != buf2){
     while((res2 = read(info->fd, &buf2, 1))==0)
-       continue;
-     BBC2 = BBC2^buf2;
-     buf2 = 0;
-   }
+      continue;
+    BBC2 = BBC2^buf2;
+    dados[i] = buf2;
+    if (i == 0)
+      buf2 = 1;
+    i++;
+  }
+
+  while((res2 = read(info->fd, &buf2, 1))==0)
+    continue;
+  state_machine(estado, buf2, "I");
+  if (estado == STOP2)
+    return dados;
+  else
+    return "fail";
 
 }
 
@@ -325,7 +351,17 @@ int llwrite(int fd, char * buffer, int length){
 }
 
 int llread(int fd, char * buffer){
-
+  char * tramaI;
+  tramaI = receberI(RECEIVER);
+  if (tramaI == "fail"){
+    //enviar frame REJ
+    return 0;
+  }
+  printf("tramaI: %s \n", tramaI);
+  buffer = tramaI;
+  char * rrtype = sprintf("rr%d", info->sequenceNumber+1);
+  transmitirSET(RECEIVER, rrtype);
+  return 1;
 }
 
 char * comporTramaI(int flag, char * buffer, int length){
