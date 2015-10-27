@@ -364,7 +364,7 @@ int llwrite(int fd, char * buffer, int length){
   char * tramaI;
   //strcpy(tramaI, comporTramaI(TRANSMITTER, buffer, length));
   tramaI = comporTramaI(TRANSMITTER, buffer, length);
-  printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],trama[8]);
+  printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
   transmitirFrame(tramaI, 5+length);
   alarm(3);
   free(tramaI);
