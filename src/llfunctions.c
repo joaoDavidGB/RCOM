@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <string.h>
 #include <signal.h>
 #include "alarme.h"
 
@@ -34,18 +35,27 @@ struct Info {
   unsigned int timeout; /*Valor do temporizador: 1 s*/
   unsigned int numTransmissions; /*Número de tentativas em caso de falha*/
   
-  char frame[MAX_SIZE]; /*Trama*/
+  char frame[255]; /*Trama*/
 
 };
 
 
 int llopen(int porta, int flag);
 int llclose(int fd);
+int llclose_transmitter(int fd);
+int llclose_receiver(int fd);
 void state_machine(int state, char signal, char * type);
 int trasmitirSET(int flag, char * type);
 int receberSET(int flag, char * type);
 int llwrite(int fd, char * buffer, int length);
 int llread(int fd, char * buffer);
+int Is_cmd(int comand);
+int campo_endereco(int role, int c);
+int transmitirFrame(char * frame, int length);
+void stuffing(unsigned char* frame, unsigned int* size);
+void destuffing(unsigned char* frame, unsigned int* size);
+char * comporTramaI(int flag, char * buffer, int length);
+char * receberI(int flag);
 
 
 volatile int STOP=FALSE;
@@ -123,7 +133,7 @@ int llopen(int porta, int flag){
   else{
     while(tentativas > 0){
       transmitirSET(flag, "set");
-      install_handler(atende(3), 3);
+      alarm(3);
       if (receberSET(flag, "ua") != 1)
         tentativas--;
       else{
@@ -336,7 +346,7 @@ void state_machine(int state, char signal, char * type){
 
 int llwrite(int fd, char * buffer, int length){
   char * tramaI;
-  tramaI = comporTramaI(TRANSMITTER, buffer, length);
+  strcpy(tramaI, comporTramaI(TRANSMITTER, buffer, length));
   transmitirFrame(tramaI, length);
   alarm(3);
   if (info->sequenceNumber == 1){
@@ -359,7 +369,8 @@ int llread(int fd, char * buffer){
   }
   printf("tramaI: %s \n", tramaI);
   buffer = tramaI;
-  char * rrtype = sprintf("rr%d", info->sequenceNumber+1);
+  char * rrtype;
+  sprintf(rrtype, "rr%d", info->sequenceNumber+1);
   transmitirSET(RECEIVER, rrtype);
   return 1;
 }
@@ -380,8 +391,11 @@ char * comporTramaI(int flag, char * buffer, int length){
     trama[4 + length] = trama[4 + length]^trama[4 + index];
   }
   trama[4 + length + 1] = F;
+
+  return trama;
 }
 
+/*
 //DESTUFFING feito pela Filipa
 void destuffing(unsigned char* frame, unsigned int* size){
     if(frame[i] == 0x7d && frame[i++] == 0x5e){
@@ -415,6 +429,7 @@ void stuffing(unsigned char* frame, unsigned int* size){
   }
  }
 
+*/
 int transmitirFrame(char * frame, int length){
   int i;
   printf("Enviar frame: ");
@@ -423,7 +438,6 @@ int transmitirFrame(char * frame, int length){
     printf("0x%x", frame[i]);
   }
   printf("/n");
-
 }
 
 int RR(int N){
