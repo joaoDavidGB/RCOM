@@ -185,11 +185,12 @@ int receberSET(int flag, char * type){
 	     continue;
     }
     else
-	    res2 = read(info->fd, &buf2, 1);
+	    while((res2 = read(info->fd, &buf2, 1))==0)
+       continue;
 
     printf("Received: %x !!! %d \n", buf2, res2);
     i++;
-    printf("i = %d\n", i);
+    //printf("i = %d\n", i);
     
     state_machine(estado, buf2, type);
     if(estado == STOP2){
