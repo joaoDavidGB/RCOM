@@ -85,6 +85,7 @@ int main(int argc, char** argv){
     teste[0] = 0x11;
     teste[1] = 0x22;
     teste[2] = 0x05;
+    sleep(3);
     llwrite(info->fd, teste, 3);
     llclose_transmitter(info->fd);
   }
@@ -252,9 +253,10 @@ char * receberI(int flag){
       while((res2 = read(info->fd, &buf2, 1))==0 && buf2!=F)
        continue;
     }
-    else
+    else{
       while((res2 = read(info->fd, &buf2, 1))==0)
        continue;
+   }
 
      printf("ReceivedI: %x !!! %d \n", buf2, res2);
      state_machine(estado, buf2, "I");
@@ -365,6 +367,7 @@ int llread(int fd, char * buffer){
   tramaI = receberI(RECEIVER);
   if (tramaI == "fail"){
     //enviar frame REJ
+    printf("falhou a receber a I: %s \n", tramaI);
     return 0;
   }
   printf("tramaI: %s \n", tramaI);
