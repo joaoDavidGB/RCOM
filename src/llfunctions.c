@@ -74,18 +74,18 @@ int main(int argc, char** argv){
   info->sequenceNumber = 0;
   if (strcmp("0", argv[1])==0){
     llopen(atoi(argv[2]), RECEIVER);
+    char * result;
+    llread(info->fd, result);
+    printf("Result: %s /n", result);
+    llclose_receiver(info->fd);
+  }
+  else if (strcmp("1", argv[1])==0){
+    llopen(atoi(argv[2]), TRANSMITTER);
     char * teste;
     teste[0] = 0x11;
     teste[1] = 0x22;
     teste[2] = 0x05;
     llwrite(info->fd, teste, 3);
-    llclose_receiver(info->fd);
-  }
-  else if (strcmp("1", argv[1])==0){
-    llopen(atoi(argv[2]), TRANSMITTER);
-    char * result;
-    llread(info->fd, result);
-    printf("Result: %s /n", result);
     llclose_transmitter(info->fd);
   }
 }
