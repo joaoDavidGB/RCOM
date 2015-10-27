@@ -86,6 +86,7 @@ int main(int argc, char** argv){
     teste[1] = 0x22;
     teste[2] = 0x05;
     sleep(3);
+    printf("llwrite de %s \n", teste);
     llwrite(info->fd, teste, 3);
     llclose_transmitter(info->fd);
   }
@@ -349,6 +350,7 @@ void state_machine(int state, char signal, char * type){
 int llwrite(int fd, char * buffer, int length){
   char * tramaI;
   strcpy(tramaI, comporTramaI(TRANSMITTER, buffer, length));
+  printf("tramaI para envio: %s \n", tramaI);
   transmitirFrame(tramaI, length);
   alarm(3);
   if (info->sequenceNumber == 1){
