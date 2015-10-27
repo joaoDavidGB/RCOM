@@ -353,7 +353,7 @@ int llwrite(int fd, char * buffer, int length){
   //strcpy(tramaI, comporTramaI(TRANSMITTER, buffer, length));
   tramaI = comporTramaI(TRANSMITTER, buffer, length);
   printf("partes: %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3]);
-  transmitirFrame(tramaI, length);
+  transmitirFrame(tramaI, 5+length);
   alarm(3);
   free(tramaI);
   if (info->sequenceNumber == 1){
