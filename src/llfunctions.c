@@ -78,6 +78,7 @@ int main(int argc, char** argv){
     char * result;
     llread(info->fd, result);
     printf("Result: %s /n", result);
+    printf("INICIAR LLCLOSE\n");
     llclose_receiver(info->fd);
   }
   else if (strcmp("1", argv[1])==0){
@@ -89,6 +90,7 @@ int main(int argc, char** argv){
     sleep(3);
     printf("llwrite de %x, %x, %x \n", teste[0], teste[1], teste[2]);
     llwrite(info->fd, teste, 3);
+    printf("INICIAR LLCLOSE\n");
     llclose_transmitter(info->fd);
   }
 }
@@ -282,11 +284,14 @@ char * receberI(int flag){
     i++;
   }
 
+  printf("acabaram os dados\n");
   while((res2 = read(info->fd, &buf2, 1))==0)
     continue;
   state_machine(estado, buf2, "I");
-  if (estado == STOP2)
+  if (estado == STOP2){
+    printf("recebeu a trama I corretamente\n");
     return dados;
+  }
   else
     return "fail";
 
