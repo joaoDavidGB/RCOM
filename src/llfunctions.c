@@ -274,6 +274,7 @@ char * receberI(int flag){
   i = 0;
   buf2 = 1;
   while(BBC2 != buf2){
+    printf("BBC2=%x -- buf2=%x \n", BBC2, buf2);
     while((res2 = read(info->fd, &buf2, 1))==0)
       continue;
     printf("ReceivedDados[%d]: %x !!! %d \n", i, buf2, res2);
