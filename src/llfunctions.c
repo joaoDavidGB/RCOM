@@ -394,14 +394,15 @@ int llread(int fd, char * buffer){
   printf("Dados recebidos: %x, %x, %x \n", info->dados[0],info->dados[1],info->dados[2]);
   if (info->dados == "fail"){
     //enviar frame REJ
-    printf("falhou a receber a I: %s \n", info->dados);
+    fprintf(stderr, "falhou a receber a I: %s \n", info->dados);
     return 0;
   }
-  buffer = info->dados;
-  char * rrtype;
+  char * rrtype = malloc(5);
+  printf("cenas dos rr\n");
   sprintf(rrtype, "rr%d", info->sequenceNumber+1);
-  printf("enviar %s\n", rrtype);
+  fprintf(stderr, "enviar %s\n", rrtype);
   transmitirSET(RECEIVER, rrtype);
+  free(rrtype);
   return 1;
 }
 
