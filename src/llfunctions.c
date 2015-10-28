@@ -23,6 +23,8 @@
 #define C_I1 0x20
 #define TRANSMITTER 1
 #define RECEIVER 0
+#define RR(N) (N<<5 | 1)
+#define REJ(N) (N<<5 | 5)
 
 struct Info {
   int fd; // descritor de ficheiro
@@ -76,24 +78,25 @@ int filesize; //file size
 enum state {START, FLAG, A_STATE, C, BCC_STATE, STOP2};
 int estado = START;
 
+
+/*
+  Função main para testar LL's
+*/
 int main(int argc, char** argv){
   info = malloc(sizeof(struct Info));
-  info->sequenceNumber = 0;
+  info->sequenceNumber = atoi(argv[3]);
   info->dados = malloc(255);
   printf("sequenceNumber: %d \n", info->sequenceNumber);
-  if (strcmp("0", argv[1])==0){
-    llopen(atoi(argv[2]), RECEIVER);
+  if (strcmp("0", argv[1])==0){       //RECEIVER
+    llopen(atoi(argv[2]), RECEIVER); 
     char * result;
     llread(info->fd, result);
-    printf("Result: %s /n", result);
     printf("INICIAR LLCLOSE\n");
     llclose_receiver(info->fd);
   }
-  else if (strcmp("1", argv[1])==0){
+  else if (strcmp("1", argv[1])==0){      //Transmitter
     llopen(atoi(argv[2]), TRANSMITTER);
-    printf("cenas\n");
     info->dados[0] = 0x11;
-    printf("cenas\n");
     info->dados[1] = 0x22;
     info->dados[2] = 0x05;
     sleep(1);
@@ -117,11 +120,6 @@ int main(int argc, char** argv){
 
  if(read(file, buf, filesize) < 0)
 	return 1;
-
-	
-	
-
-
 }
 
 int llopen(int porta, int flag){
@@ -232,6 +230,14 @@ int transmitirSET(int flag, char * type){
     SET[2] = C_UA;
   else if (type == "disc")
     SET[2] = C_DISC;
+  else if (type == "rr1"){
+    SET[2] = RR(1);
+    printf("RR(1) = %x \n", SET[2]);
+  }
+  else if (type == "rr0"){
+    SET[2] = RR(0);
+    printf("RR(0) = %x \n", SET[2]);
+  }
   SET[3] = SET[1]^SET[2];
   SET[4] = F;
 
@@ -356,8 +362,8 @@ void state_machine(int state, char signal, char * type){
                 else if ((signal == C_SET && type == "set")
                   || (signal == C_UA && type == "ua")
                   || (signal == C_DISC && type == "disc")
-                  || (signal == RR(0) && type == "rr1")
-                  || (signal == RR(1) && type == "rr0")
+                  || (signal == RR(1) && type == "rr1")
+                  || (signal == RR(0) && type == "rr0")
                   || (signal == info->sequenceNumber && type == "I")){
                         state = C;
                         SET2[2]=signal;
@@ -397,13 +403,13 @@ int llwrite(int fd, char * buffer, int length){
   alarm(3);
   free(tramaI);
   if (info->sequenceNumber == 1){
-    if (receberSET(TRANSMITTER, "rr1")){
+    if (receberSET(TRANSMITTER, "rr0")){
       printf("recebeu rr corretamente \n");
       alarm(0);
     }
   }
   else if (info->sequenceNumber == 0){
-    if (receberSET(TRANSMITTER, "rr0")){
+    if (receberSET(TRANSMITTER, "rr1")){
       printf("recebeu rr corretamente \n");
       alarm(0);
     }
@@ -418,13 +424,13 @@ int llread(int fd, char * buffer){
   receberI(RECEIVER);
   printf("Dados recebidos: %x, %x, %x \n", info->dados[0],info->dados[1],info->dados[2]);
   if (info->dados == "fail"){
-    //enviar frame REJ
+    //transmitirSET(RECEIVER, "rej");
     fprintf(stderr, "falhou a receber a I: %s \n", info->dados);
     return 0;
   }
   char * rrtype = malloc(5);
   printf("cenas dos rr\n");
-  sprintf(rrtype, "rr%d", info->sequenceNumber+1);
+  sprintf(rrtype, "rr%d", !info->sequenceNumber);
   fprintf(stderr, "enviar %s\n", rrtype);
   transmitirSET(RECEIVER, rrtype);
   free(rrtype);
@@ -500,14 +506,6 @@ int transmitirFrame(char * frame, int length){
     fprintf(stderr,"0x%x ", frame[i]);
   }
   fprintf(stderr,"/n");
-}
-
-int RR(int N){
-  return (N<<5 | 1);
-}
-
-int REJ(int N){
-  return (N<<5 | 5);
 }
 
 int campo_endereco(int role, int c){
