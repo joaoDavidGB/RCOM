@@ -80,20 +80,26 @@ int llopen(int porta, int flag){
   info->tentativas = 3;
 
   if (flag == RECEIVER){
-    if(receberSET(flag, "set")==1)
-      transmitirSET(flag, "ua");
-    else{
-      fprintf(stderr, "Não recebeu a trama set corretamente no llopen() \n");
-      return -1;
+    while(info->tentativas > 0){
+      if(receberSET(flag, "set")==1){
+        transmitirSET(flag, "ua");
+        break;
+      }
+      else{
+        fprintf(stderr, "Não recebeu a trama set corretamente no llopen() \n");
+        info->tentativas--;
+      }
     }
-
   }
   else{
     while(info->tentativas > 0){
-      transmitirSET(flag, "set");
       start_alarm();
-      fprintf(stderr, "alarm\n");
-      sleep(5);
+      transmitirSET(flag, "set");
+      if (getFlag()){
+        stop_alarm();
+        info->tentativas--;
+        continue;
+      }
       if (receberSET(flag, "ua") != 1)
         info->tentativas--;
       else{
@@ -128,17 +134,19 @@ int llclose_receiver(int fd){
 
     if (receberSET(1, "disc") == 1){
       transmitirSET(1, "disc");
+      start_alarm();
       if (receberSET(1, "ua") != 1){
-        return -1;
+        return 0;
       }
+      stop_alarm();
     }
     else
-      return -1;
+      return 0;
 
 
     if ( tcsetattr(info->fd,TCSANOW,&info->oldtio) == -1) {
       perror("tcsetattr");
-      return -1;
+      return 0;
     }
     close(fd);
     printf("fechou recetor\n");
@@ -180,15 +188,12 @@ int receberSET(int flag, char * type){
   estado = START;
   int i = 0;
   while(i < 5){
-    if (i == 0){
-      while((res2 = read(info->fd, &buf2, 1))==0 && buf2!=F)
-	     continue;
-    }
-    else
-	    while((res2 = read(info->fd, &buf2, 1))==0)
-       continue;
+    while((res2 = read(info->fd, &buf2, 1))==0)
+      continue;
 
-    printf("Received: %x !!! %d \n", buf2, res2);
+    if (buf2 == F)
+      i = 0;
+    printf("ReceivedS[%d]: %x !!! %d \n", i, buf2, res2);
     i++;
     //printf("i = %d\n", i);
     
@@ -204,57 +209,64 @@ int receberSET(int flag, char * type){
 }
 
 char * receberI(int flag){
-  //char * dados;
-  //dados = malloc(sizeof(255));
   char buf2 = 0;
   int res2;
-  int i;
+  int i=0;
+  int j=0;
   estado = START;
-  for (i = 0; i < 4; i++){
-    if (i == 0){
-      while((res2 = read(info->fd, &buf2, 1))==0 && buf2!=F)
-       continue;
+  char BBC2 = 0;
+  int lastIte = 0;
+  while(1){
+    while((res2 = read(info->fd, &buf2, 1))==0)
+     continue;
+
+    if (buf2 == F){
+      if (lastIte){
+        break;
+      }
+      else{
+        i = 0;
+        j = 0;
+      }
+    }
+
+    if (i < 4){
+      //printf("ReceivedI[%d]: %x !!! %d \n", i, buf2, res2);
+      state_machine(estado, buf2, "I");
+      if (estado == START){
+        i = 0;
+        continue;
+      }
+      else
+        i++;
     }
     else{
-      while((res2 = read(info->fd, &buf2, 1))==0)
-       continue;
-   }
+      if (BBC2 == buf2){
+        lastIte = 1; //passa a ultima iteração
+        continue;
+      }
+      if (estado != BCC_STATE)
+        return "fail";
 
-     printf("ReceivedI[%d]: %x !!! %d \n", i, buf2, res2);
-     state_machine(estado, buf2, "I");
-  }
-  if (estado != BCC_STATE)
-    return "fail";
+      //printf("ReceivedDados[%d]: %x !!! %d \n", i, buf2, res2);
+      //printf("BBC2=%x -- buf2=%x \n", BBC2, buf2);
 
-  printf("nao falhou na receçao dos primeiros do I\n");
-  char BBC2 = 0;
-  i = 0;
-  buf2 = 1;
-  while(BBC2 != buf2){
-    while((res2 = read(info->fd, &buf2, 1))==0)
-      continue;
-    printf("ReceivedDados[%d]: %x !!! %d \n", i, buf2, res2);
-    printf("BBC2=%x -- buf2=%x \n", BBC2, buf2);
-    if (BBC2 == buf2)
-      break;
-    BBC2 = BBC2^buf2;
-    info->dados[i] = buf2;
-    if (i == 0)
-      buf2 = 1;
-    i++;
+      BBC2 = BBC2^buf2;
+      info->dados[j] = buf2;
+      j++;
+
+    }
   }
 
-  printf("acabaram os dados\n");
-  while((res2 = read(info->fd, &buf2, 1))==0)
-    continue;
-  //state_machine(estado, buf2, "I");
-  if (estado == STOP2){
-    printf("recebeu a trama I corretamente\n");
-    return info->dados;
+  info->lengthDados = j;
+  int ecx;
+  fprintf(stderr, "Dados recebidos: ");
+  for(ecx = 0; ecx < info->lengthDados; ecx++){
+    fprintf(stderr, " %x ", info->dados[ecx]);
   }
-  else
-    return "fail";
+  fprintf(stderr, "\n");
 
+  return info->dados;
 }
 
 void state_machine(int state, char signal, char * type){

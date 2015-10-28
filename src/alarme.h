@@ -11,3 +11,4 @@ void atende(int sig);
 int install_handler(void(*handler)(int), int timeout);
 void start_alarm();
 void stop_alarm();
+int getFlag();

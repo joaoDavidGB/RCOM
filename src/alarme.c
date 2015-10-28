@@ -2,7 +2,7 @@
 
 int timeout = 0;
 
-int flag=1, conta=1;
+int flag=0, conta=1;
 
 void atende(int sig)                   // atende alarme
 {
@@ -25,12 +25,17 @@ int install_handler(void(*handler)(int), int timeOut){
 
 void start_alarm(){
 	alarm(timeout);
+	flag = 0;
 }
 
 void stop_alarm(){
 	alarm(0);
+	flag = 0;
 }
 
+int getFlag(){
+	return flag;
+}
 
 
 /*
