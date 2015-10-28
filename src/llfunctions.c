@@ -187,15 +187,15 @@ int receberSET(int flag, char * type){
   int res2;
   estado = START;
   int i = 0;
-  while(i < 5){
+  for(i = 0; i < 5; i++){
     while((res2 = read(info->fd, &buf2, 1))==0)
       continue;
 
-    if (buf2 == F)
+    if (buf2 == F && i != 4){
       i = 0;
-    printf("ReceivedS[%d]: %x !!! %d \n", i, buf2, res2);
-    i++;
-    //printf("i = %d\n", i);
+      estado = START;
+    }
+    printf("Received%s[%d]: %x !!! %d \n", type, i, buf2, res2);
     
     state_machine(estado, buf2, type);
     if(estado == STOP2){
