@@ -246,7 +246,7 @@ int llopen(int porta, int flag){
     info->frameTempLength = readFrame(info->frameTemp);
     if (verifyFrame(info->frameTemp, info->frameTempLength, "set")){
       buildFrame(flag, "ua");
-      transmitirFrame(info->frameSend, info->frameSendLength);
+      //transmitirFrame(info->frameSend, info->frameSendLength);
       return 1;
     }
   }
@@ -263,7 +263,7 @@ int transmitirFrame(char * frame, int length){
     res = write(info->fd,&frame[i],1);
     fprintf(stderr,"0x%x ", frame[i]);
   }
-  fprintf(stderr,"/n");
+  fprintf(stderr,"\n");
 }
 
 void state_machine(int state, char signal, char * type){
