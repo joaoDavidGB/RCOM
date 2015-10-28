@@ -10,7 +10,7 @@
 
 int fd, control;
 
-// SEND THE CONTROL PACKAGE
+// SEND THE CONTROL 6PACK
 void send_CONTROL_pck(int arg, int tamanho, char nome){
     if (arg == 1){ // start package
 	int t = 0;
