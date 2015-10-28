@@ -1,11 +1,9 @@
-#include "alarme.h"
 #include "llfunctions.h"
 
 /*
   Função main para testar LL's
 */
 int main(int argc, char** argv){
-
   info = malloc(sizeof(struct Info));
   info->sequenceNumber = atoi(argv[3]);
   info->dados = malloc(255);
@@ -95,6 +93,7 @@ int llopen(int porta, int flag){
       transmitirSET(flag, "set");
       start_alarm();
       fprintf(stderr, "alarm\n");
+      sleep(5);
       if (receberSET(flag, "ua") != 1)
         info->tentativas--;
       else{
@@ -386,7 +385,7 @@ char * comporTramaI(int flag, char * buffer, int length){
   return trama;
 }
 
-
+/*
 //DESTUFFING feito pela Filipa
 void destuffing(unsigned char* frame, unsigned int* size){
     if(frame[i] == 0x7d && frame[i++] == 0x5e){
@@ -419,6 +418,7 @@ void stuffing(unsigned char* frame, unsigned int* size){
       }
   }
  }
+ */
 
 
 int transmitirFrame(char * frame, int length){

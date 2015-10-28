@@ -1,3 +1,5 @@
+#pragma once
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -6,7 +8,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <string.h>
-#include <signal.h>
+#include "alarme.h"
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */

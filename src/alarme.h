@@ -1,9 +1,12 @@
+#pragma once
+
 #include <unistd.h>
 #include <signal.h>
 #include <stdio.h>
 #include <signal.h>
 
-int flag=1, conta=1;
+extern int flag;
+extern int conta;
 void atende(int sig);
 int install_handler(void(*handler)(int), int timeout);
 void start_alarm();

@@ -2,7 +2,7 @@
 
 int timeout = 0;
 
-
+int flag=1, conta=1;
 
 void atende(int sig)                   // atende alarme
 {
