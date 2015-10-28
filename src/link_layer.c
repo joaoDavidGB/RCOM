@@ -234,11 +234,11 @@ int llopen(int porta, int flag){
       info->frameTempLength = readFrame(info->frameTemp);
       if (verifyFrame(info->frameTemp, info->frameTempLength, "ua")){
         stop_alarm();
+        info->tentativas = 3;
         return 1;
       }
       else{
-        info->tentativas--;
-        continue;
+        return 0;
       }
     }
   }
@@ -383,9 +383,8 @@ void atende(int sig)                   // atende alarme
   printf("alarme # %d\n", conta);
   flag=1;
   conta++;
-  if (info->tentativas != 0){
+  if (info->tentativas > 0){
     transmitirFrame(info->frameSend, info->frameSendLength);
     info->tentativas--;
   }
-  stop_alarm();
 }
