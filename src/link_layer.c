@@ -56,7 +56,8 @@ int readFrame(char * frame){
           frame[i] = buf2;
         }
         else{ //se a trama tiver tamanho 5 ou superior termina
-          frame[i] = buf2; 
+          frame[i] = buf2;
+          i++; 
           break;
         }
       }
@@ -72,6 +73,7 @@ int readFrame(char * frame){
     }
     else
       continue;
+
 
     i++;
   }
