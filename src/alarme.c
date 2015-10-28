@@ -19,7 +19,7 @@ int install_handler(void(*handler)(int), int timeout){
     alarm(timeout);
 }
 
-
+/*
 int main()
 {
 
@@ -34,4 +34,4 @@ int main()
 	printf("Tentativas maximas atingidas.\n");
 	return 0;
 }
-
+*/
