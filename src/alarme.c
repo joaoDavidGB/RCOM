@@ -4,12 +4,6 @@ int timeout = 0;
 
 int flag=0, conta=1;
 
-void atende(int sig)                   // atende alarme
-{
-	printf("alarme # %d\n", conta);
-	flag=1;
-	conta++;
-}
 
 int install_handler(void(*handler)(int), int timeOut){
  	struct sigaction sa;
