@@ -44,6 +44,9 @@ int readFrame(char * frame){
     while((res2 = read(info->fd, &buf2, 1))==0)
       continue;
 
+    if (res2 == -1)
+      return 0;
+
     start_alarm();
 
     printf("Received[%d]: %x !!! %d \n", i, buf2, res2);
@@ -230,15 +233,13 @@ int llopen(int porta, int flag){
     buildFrame(flag, "set");
     transmitirFrame(info->frameSend, info->frameSendLength);
     while(info->tentativas > 0){
+      printf("tentativasOpen = %d \n", info->tentativas);
       start_alarm();
       info->frameTempLength = readFrame(info->frameTemp);
       if (verifyFrame(info->frameTemp, info->frameTempLength, "ua")){
         stop_alarm();
         info->tentativas = 3;
         return 1;
-      }
-      else{
-        return 0;
       }
     }
   }
@@ -383,8 +384,12 @@ void atende(int sig)                   // atende alarme
   printf("alarme # %d\n", conta);
   flag=1;
   conta++;
+  printf("tentativas = %d \n", info->tentativas);
   if (info->tentativas > 0){
     transmitirFrame(info->frameSend, info->frameSendLength);
     info->tentativas--;
+  }
+  else{
+    stop_alarm();
   }
 }
