@@ -1,5 +1,7 @@
 #include "llfunctions.h"
 
+#define MAX_FRAME_SIZE 100
+
 /*
   Função main para testar LL's
 */
@@ -13,6 +15,7 @@ int main(int argc, char** argv){
 
 
   if (strcmp("0", argv[1])==0){       //RECEIVER
+    info->flag = RECEIVER;
     llopen(atoi(argv[2]), RECEIVER); 
     char * result;
     llread(info->fd, result);
@@ -20,6 +23,7 @@ int main(int argc, char** argv){
     llclose_receiver(info->fd);
   }
   else if (strcmp("1", argv[1])==0){      //Transmitter
+    info->flag = TRANSMITTER;
     llopen(atoi(argv[2]), TRANSMITTER);
     info->dados[0] = 0x11;
     info->dados[1] = 0x22;
@@ -43,8 +47,19 @@ int main(int argc, char** argv){
 
  filesize = fileStat.st_size;	
 
- if(read(file, buf, filesize) < 0)
+ if(read(file, buf, filesize) < 0)  //CONFIRMAR SE ESTA A LER PARA DENTRO DO BUF!!!!!
 	return 1;
+
+
+int numDataPack = filesize/MAX_FRAME_SIZE;
+
+int i = 0;
+
+for(i=0; i<numDataPack ; i++){
+
+  }
+  
+
 }
 
 int llopen(int porta, int flag){
@@ -220,6 +235,8 @@ char * receberI(int flag){
     while((res2 = read(info->fd, &buf2, 1))==0)
      continue;
 
+   printf("ReceivedI[%d]: %x !!! %d \n", i, buf2, res2);
+
     if (buf2 == F){
       if (lastIte){
         break;
@@ -282,7 +299,7 @@ void state_machine(int state, char signal, char * type){
                 if (signal == F)
                         state = FLAG;
                 else if ((signal == A && type != "I")
-                  || (signal == campo_endereco(flag, info->sequenceNumber) && type == "I")){
+                  || (signal == campo_endereco(!info->flag, info->sequenceNumber) && type == "I")){
                         state = A_STATE;
                         SET2[1]=signal;
                 }
