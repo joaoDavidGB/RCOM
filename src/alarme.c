@@ -1,5 +1,9 @@
 #include "alarme.h"
 
+int timeout = 0;
+
+
+
 void atende(int sig)                   // atende alarme
 {
 	printf("alarme # %d\n", conta);
@@ -7,17 +11,27 @@ void atende(int sig)                   // atende alarme
 	conta++;
 }
 
-int install_handler(void(*handler)(int), int timeout){
+int install_handler(void(*handler)(int), int timeOut){
  	struct sigaction sa;
  	sigaction(SIGALRM, NULL, &sa);
 
+ 	timeout = timeOut;
 
     sa.sa_handler = handler;
 
     if (sigaction(SIGALRM, &sa, NULL) == -1)
     	return -1;
-    alarm(timeout);
 }
+
+void start_alarm(){
+	alarm(timeout);
+}
+
+void stop_alarm(){
+	alarm(0);
+}
+
+
 
 /*
 int main()

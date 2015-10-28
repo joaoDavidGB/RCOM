@@ -60,6 +60,8 @@ char * comporTramaI(int flag, char * buffer, int length);
 char * receberI(int flag);
 void comporPacotesDados(int seqNumb, int sizeCampoI, int lengthDados, char* dados);
 void comporPacotesControlo(int c);
+void stuffing(unsigned char* frame, unsigned int* size);
+void destuffing(unsigned char* frame, unsigned int* size);
 
 volatile int STOP=FALSE;
 

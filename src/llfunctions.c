@@ -5,13 +5,12 @@
   Função main para testar LL's
 */
 int main(int argc, char** argv){
-  //(void) signal(SIGALRM, atende);
-
 
   info = malloc(sizeof(struct Info));
   info->sequenceNumber = atoi(argv[3]);
   info->dados = malloc(255);
   info->timeout = 3;
+  install_handler(atende, info->timeout);
   printf("sequenceNumber: %d \n", info->sequenceNumber);
 
 
@@ -94,11 +93,12 @@ int llopen(int porta, int flag){
   else{
     while(info->tentativas > 0){
       transmitirSET(flag, "set");
-      alarm(3);
+      start_alarm();
+      fprintf(stderr, "alarm\n");
       if (receberSET(flag, "ua") != 1)
         info->tentativas--;
       else{
-        alarm(0);
+        stop_alarm();
         break;
       }
     }
@@ -115,7 +115,6 @@ int llclose_transmitter(int fd){
     else
       return -1;
 
-    sleep(5);
 
     if ( tcsetattr(info->fd,TCSANOW,&info->oldtio) == -1) {
       perror("tcsetattr");
@@ -137,7 +136,6 @@ int llclose_receiver(int fd){
     else
       return -1;
 
-    sleep(5);
 
     if ( tcsetattr(info->fd,TCSANOW,&info->oldtio) == -1) {
       perror("tcsetattr");
@@ -388,7 +386,7 @@ char * comporTramaI(int flag, char * buffer, int length){
   return trama;
 }
 
-/*
+
 //DESTUFFING feito pela Filipa
 void destuffing(unsigned char* frame, unsigned int* size){
     if(frame[i] == 0x7d && frame[i++] == 0x5e){
@@ -408,21 +406,21 @@ void destuffing(unsigned char* frame, unsigned int* size){
 void stuffing(unsigned char* frame, unsigned int* size){
   for (int i = 1; i < (*size-1); i++){
       if (frame[i] == 0x7e){
-    frame[i] = 0x7d;
-    memcpy(frame + i+2,frame+i+1,*size-i-1); 
-    frame[i++] = 0x5e;
-    (*size)++;
+        frame[i] = 0x7d;
+        memcpy(frame + i+2,frame+i+1,*size-i-1); 
+        frame[i++] = 0x5e;
+        (*size)++;
       } 
       else if (frame[i] == 0x7d){
-    frame[i] = 0x7d;
-    memcpy(frame + i + 2,frame + i + 1,*size-i-1); 
-    frame[i++] = 0x5d;
-    (*size)++;
-    }
+        frame[i] = 0x7d;
+        memcpy(frame + i + 2,frame + i + 1,*size-i-1); 
+        frame[i++] = 0x5d;
+        (*size)++;
+      }
   }
  }
 
-*/
+
 int transmitirFrame(char * frame, int length){
   int i;
   fprintf(stderr, "Enviar frame tamanho %d : ", length);
@@ -463,7 +461,7 @@ int Is_cmd(int comand){
 void comporPacotesControlo(int c){
 
  buf[0] = c;
-//primeiro vou por o tamanho e depois o nome
+  //primeiro vou por o tamanho e depois o nome
  buf[1] = 0;
  buf[2] = sizeof(filesize);
  memcpy(buf+3, &filesize, sizeof(filesize));
@@ -472,8 +470,6 @@ void comporPacotesControlo(int c){
  buf[5] = sizeof(filename);
  memcpy(buf + 4 +sizeof(filesize), &filesize, strlen(filename));
 	
-
-
 }
 
 void comporPacotesDados(int seqNumb, int sizeCampoI, int lengthDados, char* dados){
@@ -482,11 +478,11 @@ void comporPacotesDados(int seqNumb, int sizeCampoI, int lengthDados, char* dado
  buf[1] = seqNumb;
  buf[2] = lengthDados/256;  
  buf[3] = lengthDados%256;
-int i;
-for(i=0; i < lengthDados; i++){
+  int i;
+  for(i=0; i < lengthDados; i++){
 
  buf[4] = dados[i];
 
-}	
+  }	
  
 }
