@@ -17,14 +17,17 @@ int main(int argc, char** argv){
   if (strcmp("0", argv[1])==0){       //RECEIVER
     info->flag = RECEIVER;
     llopen(atoi(argv[2]), RECEIVER); 
+    
     char * result;
     llread(info->fd, result);
     printf("INICIAR LLCLOSE\n");
     llclose_receiver(info->fd);
+    
   }
   else if (strcmp("1", argv[1])==0){      //Transmitter
     info->flag = TRANSMITTER;
     llopen(atoi(argv[2]), TRANSMITTER);
+    
     info->dados[0] = 0x11;
     info->dados[1] = 0x22;
     info->dados[2] = 0x05;
@@ -34,7 +37,10 @@ int main(int argc, char** argv){
     llwrite(info->fd, info->dados, info->lengthDados);
     printf("INICIAR LLCLOSE\n");
     llclose_transmitter(info->fd);
+    
   }
+
+  return 1;
 
  filename = argv[2];
  int file=0;
@@ -61,6 +67,9 @@ for(i=0; i<numDataPack ; i++){
   
 
 }
+
+
+
 
 int llopen(int porta, int flag){
 
@@ -94,8 +103,15 @@ int llopen(int porta, int flag){
 
   info->tentativas = 3;
 
+  char * frame = malloc(255);
+  char * type = malloc(5);
+
   if (flag == RECEIVER){
     while(info->tentativas > 0){
+      int lengthI = readFrame(frame);
+      type = verifyFrameType(frame);
+
+      int verifyFrame(char * frame, int length, char * type)
       if(receberSET(flag, "set")==1){
         transmitirSET(flag, "ua");
         break;
@@ -115,8 +131,10 @@ int llopen(int porta, int flag){
         info->tentativas--;
         continue;
       }
-      if (receberSET(flag, "ua") != 1)
+      if (receberSET(flag, "ua") != 1){
+        printf("menos uma tentativa: %d \n", info->tentativas);
         info->tentativas--;
+      }
       else{
         stop_alarm();
         break;
@@ -174,8 +192,10 @@ int transmitirSET(int flag, char * type){
   SET[1] = A;
   if (type == "set") 
     SET[2] = C_SET;
-  else if (type == "ua")
+  else if (type == "ua"){
+    SET[0] = C_UA;
     SET[2] = C_UA;
+  }
   else if (type == "disc")
     SET[2] = C_DISC;
   else if (!strcmp(type, "rr1"))
@@ -298,8 +318,7 @@ void state_machine(int state, char signal, char * type){
         else if (state == FLAG){
                 if (signal == F)
                         state = FLAG;
-                else if ((signal == A && type != "I")
-                  || (signal == campo_endereco(!info->flag, info->sequenceNumber) && type == "I")){
+                else if (signal == campo_endereco(!info->flag, info->sequenceNumber)){
                         state = A_STATE;
                         SET2[1]=signal;
                 }
@@ -315,7 +334,10 @@ void state_machine(int state, char signal, char * type){
                   || (signal == C_DISC && type == "disc")
                   || (signal == RR(1) && type == "rr1")
                   || (signal == RR(0) && type == "rr0")
-                  || (signal == info->sequenceNumber && type == "I")){
+                  || (signal == REJ(1) && type == "rej1")
+                  || (signal == REJ(0) && type == "rej0")
+                  || (signal == C_I0 && type == "I0")
+                  || (signal == C_I1 && type == "I1")){
                         state = C;
                         SET2[2]=signal;
                 }
