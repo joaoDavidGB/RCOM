@@ -247,6 +247,7 @@ int llopen(char * porta, int flag){
   install_handler(atende, info->timeout);
   printf("sequenceNumber: %d \n", info->sequenceNumber);
   info->tentativas = 3;
+  info->flag = flag;
 
   info->endPorta = malloc(255);
   info->endPorta = porta;
