@@ -278,6 +278,7 @@ int llopen(char * porta, int flag){
   }
 
   if (flag == TRANSMITTER){
+    printf("llopen de transmissor \n");
     buildFrame(flag, "set");
     transmitirFrame(info->frameSend, info->frameSendLength);
     while(info->tentativas > 0){
@@ -292,6 +293,7 @@ int llopen(char * porta, int flag){
     }
   }
   else{
+    printf("llopen de recetor \n");
     info->frameTempLength = readFrame(info->frameTemp);
     if (verifyFrame(info->frameTemp, info->frameTempLength, "set")){
       buildFrame(flag, "ua");
