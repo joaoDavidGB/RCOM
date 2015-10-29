@@ -46,7 +46,7 @@ void destuffing(unsigned char* frame, unsigned int* size){
 }
 
 // Cria control packages que são enviadas no antes e depois da transferência de dados
-int makeCONTROLpackage(int type, char* package, char* filename, FILE* file){
+int setCONTROLpackage(int type, char* package, char* filename, FILE* file){
 
 	if (type == 1)
 		package[0] = 0x01; // pacote enviado no início (start)
@@ -81,10 +81,23 @@ int makeCONTROLpackage(int type, char* package, char* filename, FILE* file){
 }
 
 // Cria data package que envia o ficheiro
-int makeDATApackage(char* package){
+void setDATApackage(char* package, int n, int dataLength, char* data){
 
 	package[0] = 0x00;
 
-	package[1] = ;
+	package[1] = n; // nr de sequência
+
+	package[2] = dataLength/256; 
+
+	package[3] = dataLength%256;
+
+	int k = 4;
+
+	for (int i = 0; i < dataLength; i++){
+
+		package[k] = data[i];
+		k++; 
+
+	}
 
 }
