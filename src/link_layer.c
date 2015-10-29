@@ -281,6 +281,7 @@ int llopen(int porta, int flag){
     if (verifyFrame(info->frameTemp, info->frameTempLength, "set")){
       buildFrame(flag, "ua");
       //transmitirFrame(info->frameSend, info->frameSendLength);
+      printf("terminar llopen recetor \n");
       return 1;
     }
   }
@@ -331,6 +332,8 @@ int llwrite(int fd, char * buffer, int length){
 }
 
 int llread(int fd, char * buffer){
+
+  printf("iniciar llread \n");
   while(1){
     info->frameTempLength = readFrame(info->frameTemp);
     char * type = malloc(5);
