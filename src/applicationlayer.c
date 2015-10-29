@@ -14,8 +14,6 @@
 
 #define MAX_FRAME_SIZE 100
 
-char* buf; //file buffer
-int bf;
 char* filename; //file name
 int filesize; //file size
 
@@ -37,15 +35,15 @@ int main(int argc, char** argv){
 
 int numDataPack = filesize/MAX_FRAME_SIZE;
 
-int i = 0;
 
-int n1 = makeCONTROLpackage(1);
+char* buf; //escrevemos sempre no mesmo buffer ele é sempre reescrito
+int n1 = makeCONTROLpackage(buf,1);
 
 if(n1!=0)
  return 1;
 
 unsigned char seqNumb = 0;
-
+int i = 0;
 for(i=0; i<numDataPack ; i++){
 	
 	int lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2;
@@ -53,11 +51,14 @@ for(i=0; i<numDataPack ; i++){
 
 	if(read(file, dados, filesize) < 0)  //CONFIRMAR SE ESTA A LER PARA OS DADOS!!!!!
 		return 1;
- 	makeDATApackage(seqNumb, lengthDados, dados)
+ 	int suc = makeDATApackage(buf, seqNumb, lengthDados, dados);
+	
+	if(suc != 0)
+	  return 1;
 	
   }
   
-int n2 = makeCONTROLpackage(1);
+int n2 = makeCONTROLpackage(buf,2);
 
 if(n2!=0)
  return 1;
@@ -69,7 +70,7 @@ return 0;
 
 
 // Cria control packages que são enviadas no antes e depois da transferência de dados
-int makeCONTROLpackage(int c){
+int makeCONTROLpackage(char* buf,int c){
 
 	if (c == 1 || c == 2)
 	  buf[0] = c; // pacote enviado no início (start) e no final (end)
@@ -92,7 +93,7 @@ int makeCONTROLpackage(int c){
 
 
 // Cria data package que envia o ficheiro
-int makeDATApackage(int seqNumb, int lengthDados, char* dados){
+int makeDATApackage(char* buf,int seqNumb, int lengthDados, char* dados){
 
  buf[0] = 0;
  buf[1] = seqNumb;
