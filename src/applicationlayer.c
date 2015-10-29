@@ -1,16 +1,7 @@
 /*
 * Aplication Layer
 */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <llfunctions.h>
-#include <termios.h>
-#include <stdio.h>
-#include <signal.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <strings.h>
+#include "applicationlayer.h"
 
 #define MAX_FRAME_SIZE 100
 
@@ -68,7 +59,6 @@ return 0;
 
 }
 
-
 // Cria control packages que são enviadas no antes e depois da transferência de dados
 int makeCONTROLpackage(char* buf,int c){
 
@@ -90,7 +80,6 @@ int makeCONTROLpackage(char* buf,int c){
 	return 0;
 
 }
-
 
 // Cria data package que envia o ficheiro
 int makeDATApackage(char* buf,int seqNumb, int lengthDados, char* dados){
