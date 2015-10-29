@@ -54,7 +54,7 @@ int readFrame(char * frame){
     if (res2 == -1)
       return 0;
 
-    start_alarm();
+    //start_alarm();
 
     printf("Received[%d]: %x !!! %d \n", i, buf2, res2);
     
