@@ -280,7 +280,7 @@ int llopen(int porta, int flag){
     info->frameTempLength = readFrame(info->frameTemp);
     if (verifyFrame(info->frameTemp, info->frameTempLength, "set")){
       buildFrame(flag, "ua");
-      //transmitirFrame(info->frameSend, info->frameSendLength);
+      transmitirFrame(info->frameSend, info->frameSendLength);
       printf("terminar llopen recetor \n");
       return 1;
     }
@@ -315,10 +315,13 @@ int llwrite(int fd, char * buffer, int length){
     }
     else if (info->sequenceNumber == 0){
       if (verifyFrame(info->frameTemp, info->frameTempLength, "rr1")){
+        printf("teste nao recebe RR\n");
+        /*
         printf("recebeu rr corretamente \n");
         stop_alarm();
         info->tentativas = info->timeout;
         break;
+        */
       }
       else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej1")){
         printf("recebeu rej1\n");
