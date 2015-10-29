@@ -17,6 +17,7 @@ int main(int argc, char** argv){
     info->flag = RECEIVER;
     llopen(atoi(argv[2]), RECEIVER);
     llread(info->fd, info->dados);
+    llclose_receiver(info->fd);
   }
   else if (strcmp("1", argv[1])==0){      //Transmitter
     info->flag = TRANSMITTER;
@@ -28,6 +29,7 @@ int main(int argc, char** argv){
     }
     info->lengthDados = 6;
     llwrite(info->fd, info->dados, info->lengthDados);
+    llclose_transmitter(info->fd);
   }
 
 
@@ -308,20 +310,16 @@ int llwrite(int fd, char * buffer, int length){
       }
       else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej0")){
         printf("recebeu rej0\n");
-        if(transmitirFrame(info->frameSend, info->frameSendLength) != 0)
-          return 1;
+        transmitirFrame(info->frameSend, info->frameSendLength);
         continue;
       }
     }
     else if (info->sequenceNumber == 0){
       if (verifyFrame(info->frameTemp, info->frameTempLength, "rr1")){
-        printf("teste nao recebe RR\n");
-        /*
         printf("recebeu rr corretamente \n");
         stop_alarm();
         info->tentativas = info->timeout;
         break;
-        */
       }
       else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej1")){
         printf("recebeu rej1\n");
@@ -375,6 +373,95 @@ int llread(int fd, char * buffer){
     break;
   }
 
+  return 1;
+}
+
+int llclose_transmitter(int fd){
+  info->tentativas = info->timeout;
+
+  while(info->tentativas > 0){
+    buildFrame(info->flag, "disc");
+    transmitirFrame(info->frameSend, info->frameSendLength);
+    start_alarm();
+
+    info->frameTempLength = readFrame(info->frameTemp);
+    char * type = malloc(5);
+    type = verifyFrameType(info->frameTemp);
+    if (verifyFrame(info->frameTemp, info->frameTempLength, "disc")){
+      buildFrame(info->flag, "ua");
+      transmitirFrame(info->frameSend, info->frameSendLength);
+    }  
+  }
+
+
+    if ( tcsetattr(info->fd,TCSANOW,&info->oldtio) == -1) {
+      perror("tcsetattr");
+      return -1;
+    }
+    close(fd);
+    printf("fechou transmissor\n");
+    return 1;
+}
+
+int llclose_receiver(int fd){
+  info->tentativas = info->timeout;
+  while(1){
+    info->frameTempLength = readFrame(info->frameTemp);
+    char * type = malloc(5);
+    type = verifyFrameType(info->frameTemp);
+
+    if (type == "I0" || type == "I1"){
+      if (verifyFrame(info->frameTemp, info->frameTempLength, type)){
+        char * typeRR = malloc(5);
+        sprintf(typeRR, "rr%d", !info->sequenceNumber);
+        printf("criar frame de %s \n", typeRR);
+        buildFrame(info->flag, typeRR);
+        transmitirFrame(info->frameSend, info->frameSendLength);
+        free(typeRR);
+        int j;
+        printf("dados recebidos: ");
+        for(j = 0; j < (info->frameTempLength-6); j++){
+          info->dados[j] = info->frameTemp[4+j];
+          printf(" %x ", info->dados[j]);
+        }
+        printf("\n");
+        info->lengthDados = j;
+        continue;
+      }
+      else{
+        char * typeREJ = malloc(5);
+        sprintf(typeREJ, "rej%d", !info->sequenceNumber);
+        printf("criar frame de %s \n", typeREJ);
+        buildFrame(info->flag, typeREJ);
+        transmitirFrame(info->frameSend, info->frameSendLength);
+        free(typeREJ);
+        continue;
+      }
+    }
+    else if (verifyFrame(info->frameTemp, info->frameTempLength, "disc")){
+      buildFrame(info->flag, "disc");
+      transmitirFrame(info->frameSend, info->frameSendLength);
+      start_alarm();
+
+      info->frameTempLength = readFrame(info->frameTemp);
+      type = verifyFrameType(info->frameTemp);
+
+      if (verifyFrame(info->frameTemp, info->frameTempLength, "ua")){
+        return 1;
+      }
+    }
+    else{
+      printf("llclose_receiver não recebeu nem I nem disc \n");
+    }
+  }
+
+
+  if ( tcsetattr(info->fd,TCSANOW,&info->oldtio) == -1) {
+    perror("tcsetattr");
+    return 0;
+  }
+  close(fd);
+  printf("fechou recetor\n");
   return 1;
 }
 
