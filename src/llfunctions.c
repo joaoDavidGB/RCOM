@@ -410,6 +410,18 @@ int llread(int fd, char * buffer){
   return 1;
 }
 
+
+char* saveData(char* data){
+    int res = llread();
+    if(res)
+        data = info->dados;
+    return data;
+}
+
+char* writeData(){
+
+}
+
 char * comporTramaI(int flag, char * buffer, int length){
   char * trama;
   trama = malloc(sizeof(5 + length));

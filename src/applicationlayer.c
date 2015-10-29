@@ -5,10 +5,11 @@
 
 #define MAX_FRAME_SIZE 100
 
+int porta;
 
 int main(int argc, char** argv){
 
-	if(argc != 4){
+	if(argc != 5){
 		printf("numero de argumentos errado. \n");
 		pirntf("%s (porta(/dev/ttySN)) ficheiro flag(1-transmitter, 0-receiver) \n", argv[0]);
 	}
@@ -23,7 +24,7 @@ int main(int argc, char** argv){
 	else if (appLayer->flag == RECEIVER)
 		app_layer_receiver();
 	
- 	
+ 	porta = argv[3]; //estou a passar a porta como argumento.... 
 
 	
 	/*
@@ -91,6 +92,13 @@ int app_layer_transmitter(){
 	char * dados = malloc(100);
 	printf("numDataPack = %d \n", appLayer->numDataPack);
 
+	/*
+	llopen....
+	*/
+
+	 int llo = llopen(porta, 1);
+	
+
 	for(i=0; i<=numDataPack ; i++){
 		int res;
 		fprintf(stderr, "lengthDados = %d \n", appLayer->lengthDados);
@@ -104,12 +112,20 @@ int app_layer_transmitter(){
 
 		/*
 			Escrever aqui o código que usa o link_layer para enviar os dados
+			llwrite
 		*/
+
+		int llw = llwrite(appLayer->fd, dados, appLayer->lengthDados);
+	
 		seqNumb = !seqNumb;
 
 		//if(suc != 0)
 			//return 0;
 	}
+
+
+	int llc = llclose_transmitter(appLayer->fd);
+	
 
 }
 
@@ -162,3 +178,5 @@ int writeToFile(char* dados, char* buf){
 
 	else return 1;
 } 
+
+
