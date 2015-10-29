@@ -211,6 +211,14 @@ int buildFrame(int flag, char * type){
 }
 
 char * comporTramaI(int flag, char * buffer, int length){
+
+  int ecx = 0;
+  printf("tamanho dos dados a enviar: %d \n Dados: ", length);
+  for(ecx = 0; ecx < length; ecx++){
+    printf("%x.", buffer[ecx]);
+  }
+  printf("\n");
+
   int index;
   info->frameSend[0] = F;
   if (info->sequenceNumber == 1){
@@ -569,21 +577,17 @@ void state_machine(int state, char signal, char * type){
 int campo_endereco(int role, int c){
   if (role == TRANSMITTER){
     if (Is_cmd(c)){
-      printf("comando transmissor\n");
       return 0x03;
     }
     else{
-      printf("resposta transmissor\n");
       return 0x01;
     }
   }
   else if (role == RECEIVER){
     if (Is_cmd(c)){
-      printf("comando recetor\n");
       return 0x01;
     }
     else{
-      printf("resposta recetor\n");
       return 0x03;
     }
   }
