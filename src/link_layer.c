@@ -296,8 +296,7 @@ int llwrite(int fd, char * buffer, int length){
   
   comporTramaI(TRANSMITTER, buffer, info->lengthDados);
   //printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
-  if(transmitirFrame(info->frameSend, info->frameSendLength) == 0)
-    return 1;
+  transmitirFrame(info->frameSend, info->frameSendLength);
   info->tentativas = info->timeout;
   while(info->tentativas > 0){
     start_alarm();

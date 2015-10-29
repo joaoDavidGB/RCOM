@@ -96,7 +96,7 @@ int app_layer_transmitter(){
 	llopen....
 	*/
 
-	 int llo = llopen(porta, 1);
+	 int llo = llopen(porta, appLayer->flag);
 	
 
 	for(i=0; i<=numDataPack ; i++){
@@ -108,12 +108,13 @@ int app_layer_transmitter(){
 
 		fprintf(stderr, "Dados = %s | res = %d \n", dados, res);
 
-		int suc = makeDATApackage(appLayer->buf, seqNumb, res, dados);
+		int datalength = makeDATApackage(appLayer->buf, seqNumb, res, dados);
 
 		/*
 			Escrever aqui o código que usa o link_layer para enviar os dados
 			llwrite
 		*/
+		llwrite(0, appLayer->buf, datalength);
 
 		int llw = llwrite(appLayer->fd, dados, appLayer->lengthDados);
 	
@@ -167,7 +168,8 @@ int makeDATApackage(char* buf,int seqNumb, int appLayer->lengthDados, char* dado
 	int i;
 	for(i=0; i < appLayer->lengthDados; i++){
 		buf[4+i] = dados[i];
-	}	
+	}
+	return (4+i);	
 }
 
 int writeToFile(char* dados, char* buf){
