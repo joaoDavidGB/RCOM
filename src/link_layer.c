@@ -182,7 +182,6 @@ int verifyFrame(char * frame, int length, char * type){
 */
 int buildFrame(int flag, char * type){
   info->frameSend[0] = F;
-  info->frameSend[1] = A;
   if (type == "set") 
     info->frameSend[2] = C_SET;
   else if (type == "ua")
@@ -199,6 +198,7 @@ int buildFrame(int flag, char * type){
     info->frameSend[2] = REJ(0);
   else
     return 0;
+  info->frameSend[1] = campo_endereco(info->flag, info->frameSend[2]);
   info->frameSend[3] = info->frameSend[1]^info->frameSend[2];
   info->frameSend[4] = F;
   info->frameSendLength = 5;
@@ -491,7 +491,15 @@ void state_machine(int state, char signal, char * type){
         else if (state == FLAG){
                 if (signal == F)
                         state = FLAG;
-                else if (signal == A){
+                else if ((signal == campo_endereco(!info->flag, C_SET) && type == "set")
+                  || (signal == campo_endereco(!info->flag, C_UA) && type == "ua")
+                  || (signal == campo_endereco(!info->flag, C_DISC) && type == "disc")
+                  || (signal == campo_endereco(!info->flag, RR(1)) && type == "rr1")
+                  || (signal == campo_endereco(!info->flag, RR(0)) && type == "rr0")
+                  || (signal == campo_endereco(!info->flag, REJ(1)) && type == "rej1")
+                  || (signal == campo_endereco(!info->flag, REJ(0)) && type == "rej0")
+                  || (signal == campo_endereco(!info->flag, C_I0) && type == "I0")
+                  || (signal == campo_endereco(!info->flag, C_I1) && type == "I1")){
                         state = A_STATE;
                         SET2[1]=signal;
                 }
