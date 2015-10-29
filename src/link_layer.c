@@ -516,3 +516,4 @@ void atende(int sig) {
     stop_alarm();
   }
 }
+

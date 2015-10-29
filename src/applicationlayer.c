@@ -33,7 +33,8 @@ int main(int argc, char** argv){
 	if (fileLength == -1)
 	 return 1;
 
-int numDataPack = filesize/MAX_FRAME_SIZE;
+int lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2;
+int numDataPack = filesize/lengthDados;
 
 
 char* buf; //escrevemos sempre no mesmo buffer ele é sempre reescrito
@@ -46,12 +47,11 @@ unsigned char seqNumb = 0;
 int i = 0;
 for(i=0; i<numDataPack ; i++){
 	
-	int lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2;
 	char * dados;
-
-	if(read(file, dados, filesize) < 0)  //CONFIRMAR SE ESTA A LER PARA OS DADOS!!!!!
+	int res;
+	if(res = read(file, dados, lengthDados) < 0)  //CONFIRMAR SE ESTA A LER PARA OS DADOS!!!!!
 		return 1;
- 	int suc = makeDATApackage(buf, seqNumb, lengthDados, dados);
+ 	int suc = makeDATApackage(buf, seqNumb, res, dados);
 	
 	if(suc != 0)
 	  return 1;
@@ -102,7 +102,7 @@ int makeDATApackage(char* buf,int seqNumb, int lengthDados, char* dados){
   int i;
   for(i=0; i < lengthDados; i++){
 
- 	buf[4] = dados[i];
+ 	buf[4+i] = dados[i];
 
   }	
 

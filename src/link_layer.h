@@ -81,3 +81,6 @@ void comporPacotesDados(int seqNumb, int sizeCampoI, int lengthDados, char* dado
 int transmitirFrame(char * frame, int length);
 void atende(int sig);
 int llwrite(int fd, char * buffer, int length);
+int llread(int fd, char * buffer);
+char * comporTramaI(int flag, char * buffer, int length);
+int buildFrame(int flag, char * type);
