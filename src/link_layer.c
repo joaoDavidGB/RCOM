@@ -1,5 +1,6 @@
 #include "link_layer.h"
 
+int estado = START;
 /*
 int main(int argc, char** argv){
   info = malloc(sizeof(struct Info));
@@ -237,6 +238,15 @@ char * comporTramaI(int flag, char * buffer, int length){
 
 int llopen(char * porta, int flag){
 
+  info = malloc(sizeof(struct Info));
+  info->dados = malloc(255);
+  info->frameTemp = malloc(255);
+  info->frameSend = malloc(255);
+  info->timeout = 3;
+  install_handler(atende, info->timeout);
+  printf("sequenceNumber: %d \n", info->sequenceNumber);
+  info->tentativas = 3;
+
   info->fd = open(info->endPorta, O_RDWR | O_NOCTTY);
   if (info->fd < 0) {perror(info->endPorta); exit(-1);}
 
@@ -358,6 +368,7 @@ int llread(int fd, char * buffer){
         for(j = 0; j < (info->frameTempLength-6); j++){
           info->dados[j] = info->frameTemp[4+j];
           printf(" %x ", info->dados[j]);
+          buffer[j] = info->dados[j];
         }
         printf("\n");
         info->lengthDados = j;
@@ -617,7 +628,8 @@ void atende(int sig) {
 
 // Stuffing
 void stuffing(unsigned char* frame, unsigned int* size){
-  for (int i = 1; i < (*size-1); i++){
+  int i;
+  for (i = 1; i < (*size-1); i++){
       if (frame[i] == 0x7e){
         frame[i] = 0x7d;
         memmove(frame + i + 2,frame + i + 1,*size-i-1); 
@@ -635,6 +647,8 @@ void stuffing(unsigned char* frame, unsigned int* size){
 
 //DESTUFFING
 void destuffing(unsigned char* frame, unsigned int* size){
+  int i;
+  for (i = 1; i < (*size-1); i++){
     if(frame[i] == 0x7d && frame[i++] == 0x5e){
        frame[i] = 0x7e;
        memmove(frame + i + 1, frame + i + 2, *size-i-1);

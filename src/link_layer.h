@@ -51,7 +51,7 @@ struct Info {
 
 };
 
-volatile int STOP=FALSE;
+//volatile int STOP=FALSE;
 
 unsigned char SET[5];
 unsigned char SET2[5];
@@ -65,7 +65,7 @@ int filesize; //file size
 
 //STATES
 enum state {START, FLAG, A_STATE, C, BCC_STATE, STOP2};
-int estado = START;
+//int estado = START;
 
 int readFrame(char * frame);
 char * verifyFrameType(char * frame);
@@ -84,3 +84,5 @@ int llwrite(int fd, char * buffer, int length);
 int llread(int fd, char * buffer);
 char * comporTramaI(int flag, char * buffer, int length);
 int buildFrame(int flag, char * type);
+void stuffing(unsigned char* frame, unsigned int* size);
+void destuffing(unsigned char* frame, unsigned int* size);
