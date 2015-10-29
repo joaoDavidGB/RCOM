@@ -293,7 +293,7 @@ int llwrite(int fd, char * buffer, int length){
   
   comporTramaI(TRANSMITTER, buffer, info->lengthDados);
   //printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
-  if(transmitirFrame(info->frameSend, info->frameSendLength) != 0)
+  if(transmitirFrame(info->frameSend, info->frameSendLength) == 0)
     return 1;
   info->tentativas = info->timeout;
   while(info->tentativas > 0){
@@ -380,10 +380,12 @@ int transmitirFrame(char * frame, int length){
   fprintf(stderr, "Enviar frame tamanho %d : ", length);
   for(i = 0; i < length; i++){
     res = write(info->fd,&frame[i],1);
+    if (res == 0 || res == -1)
+      return 0;
     fprintf(stderr,"0x%x ", frame[i]);
   }
   fprintf(stderr,"\n");
-  return res;
+  return 1;
 }
 
 void state_machine(int state, char signal, char * type){
