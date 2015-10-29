@@ -1,5 +1,6 @@
 #include "link_layer.h"
 
+/*
 int main(int argc, char** argv){
   info = malloc(sizeof(struct Info));
   info->sequenceNumber = atoi(argv[3]);
@@ -39,6 +40,7 @@ int main(int argc, char** argv){
 
   return 1;
 }
+*/
 
 /*
   Lê uma frame para o parametro "frame" e retorna o tamanho da frame
