@@ -105,7 +105,7 @@ int app_layer_transmitter(){
 		/*
 			Escrever aqui o código que usa o link_layer para enviar os dados
 		*/
-
+		seqNumb = !seqNumb;
 
 		//if(suc != 0)
 			//return 0;
