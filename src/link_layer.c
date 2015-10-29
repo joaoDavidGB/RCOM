@@ -236,9 +236,8 @@ char * comporTramaI(int flag, char * buffer, int length){
   return info->frameSend;
 }
 
-int llopen(int porta, int flag){
+int llopen(char * porta, int flag){
 
-  sprintf(info->endPorta, "/dev/ttyS%d", porta);
   info->fd = open(info->endPorta, O_RDWR | O_NOCTTY);
   if (info->fd < 0) {perror(info->endPorta); exit(-1);}
 

@@ -70,7 +70,7 @@ int estado = START;
 int readFrame(char * frame);
 char * verifyFrameType(char * frame);
 int verifyFrame(char * frame, int length, char * type);
-int llopen(int porta, int flag);
+int llopen(char * porta, int flag);
 void state_machine(int state, char signal, char * type);
 int llopen_tramas(char * frame, int flag);
 int sendFrame(int flag, char * type);
