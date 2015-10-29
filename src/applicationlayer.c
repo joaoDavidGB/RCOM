@@ -9,7 +9,7 @@ int porta;
 
 int main(int argc, char** argv){
 
-	if(argc != 5){
+	if(argc != 4){
 		printf("numero de argumentos errado. \n");
 		pirntf("%s (porta(/dev/ttySN)) ficheiro flag(1-transmitter, 0-receiver) \n", argv[0]);
 	}
@@ -24,7 +24,7 @@ int main(int argc, char** argv){
 	else if (appLayer->flag == RECEIVER)
 		app_layer_receiver();
 	
- 	porta = argv[3]; //estou a passar a porta como argumento.... 
+ 	porta = argv[1]; //estou a passar a porta como argumento.... 
 
 	
 	/*
@@ -172,13 +172,35 @@ int makeDATApackage(char* buf,int seqNumb, int appLayer->lengthDados, char* dado
 	return (4+i);	
 }
 
-int writeToFile(char* dados, char* buf){
-	int res = write(fd,dados,  256 * buf[2] + buf[3]);
+int writeToFile(char* dados){
+
+	int res = write(fd, dados,  256 * appLayer->buf[2] + appLayer->buf[3]);
 
 	if(res == 0)
 		return 0;
 
 	else return 1;
 } 
+
+
+char* processBuf(int seqnumb){
+
+	if(appLayer->buf[0] != 0)
+		return 0;
+
+	if(appLayer->buf[1] != seqnumb)
+		return 0;
+
+	char* bf;
+	int i=0;
+	for(i=0; i< 256 * appLayer->buf[2] + appLayer->buf[3]; i++) {
+		bf[i] =  appLayer->buf[4 + i];
+	}
+	return bf;
+
+}
+
+
+
 
 

@@ -448,42 +448,6 @@ char * comporTramaI(int flag, char * buffer, int length){
   return trama;
 }
 
-/*
-//DESTUFFING feito pela Filipa
-void destuffing(unsigned char* frame, unsigned int* size){
-    if(frame[i] == 0x7d && frame[i++] == 0x5e){
-       frame[i] = 0x7e;
-       memcpy(frame + i + 1, frame + i + 2, *size-i-1);
-      (*size--);
-    }
-    else if (frame[i] == 0x7d && frame[i++]== 0x5d){
-      frame[i] = 0x7d;
-      memcpy(frame + i + 1, frame + i + 2, *size-i-1);
-     (*size--);
-    }
-  }
-}
-
-//STUFFING feito pela Filipa
-void stuffing(unsigned char* frame, unsigned int* size){
-  for (int i = 1; i < (*size-1); i++){
-      if (frame[i] == 0x7e){
-        frame[i] = 0x7d;
-        memcpy(frame + i+2,frame+i+1,*size-i-1); 
-        frame[i++] = 0x5e;
-        (*size)++;
-      } 
-      else if (frame[i] == 0x7d){
-        frame[i] = 0x7d;
-        memcpy(frame + i + 2,frame + i + 1,*size-i-1); 
-        frame[i++] = 0x5d;
-        (*size)++;
-      }
-  }
- }
- */
-
-
 int transmitirFrame(char * frame, int length){
   int i;
   fprintf(stderr, "Enviar frame tamanho %d : ", length);

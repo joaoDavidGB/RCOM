@@ -166,7 +166,6 @@ int verifyFrame(char * frame, int length, char * type){
       }
     }
 
-
   }
 
   if (estado == STOP2){
@@ -295,6 +294,7 @@ int llopen(char * porta, int flag){
 int llwrite(int fd, char * buffer, int length){
   
   comporTramaI(TRANSMITTER, buffer, info->lengthDados);
+  stuffing(info->frameSend, &info->frameSendLength);
   //printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
   transmitirFrame(info->frameSend, info->frameSendLength);
   info->tentativas = info->timeout;
@@ -345,6 +345,7 @@ int llread(int fd, char * buffer){
       continue;
     }
     else if (type == "I0" || type == "I1"){
+      destuffing(info->frameTemp, &info->frameTempLength);
       if (verifyFrame(info->frameTemp, info->frameTempLength, type)){
         char * typeRR = malloc(5);
         sprintf(typeRR, "rr%d", !info->sequenceNumber);
@@ -614,3 +615,35 @@ void atende(int sig) {
   }
 }
 
+// Stuffing
+void stuffing(unsigned char* frame, unsigned int* size){
+  for (int i = 1; i < (*size-1); i++){
+      if (frame[i] == 0x7e){
+        frame[i] = 0x7d;
+        memmove(frame + i + 2,frame + i + 1,*size-i-1); 
+        frame[i++] = 0x5e;
+        (*size)++;
+      } 
+      else if (frame[i] == 0x7d){
+        frame[i] = 0x7d;
+        memmove(frame + i + 2,frame + i + 1,*size-i-1); 
+        frame[i++] = 0x5d;
+        (*size)++;
+      }
+  }
+}
+
+//DESTUFFING
+void destuffing(unsigned char* frame, unsigned int* size){
+    if(frame[i] == 0x7d && frame[i++] == 0x5e){
+       frame[i] = 0x7e;
+       memmove(frame + i + 1, frame + i + 2, *size-i-1);
+      (*size--);
+    }
+    else if (frame[i] == 0x7d && frame[i++]== 0x5d){
+      frame[i] = 0x7d;
+      memmove(frame + i + 1, frame + i + 2, *size-i-1);
+     (*size--);
+    }
+  }
+}
