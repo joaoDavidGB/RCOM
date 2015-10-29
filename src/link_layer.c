@@ -1,7 +1,5 @@
 #include "link_layer.h"
 
-#define MAX_FRAME_SIZE 100
-
 int main(int argc, char** argv){
   info = malloc(sizeof(struct Info));
   info->sequenceNumber = atoi(argv[3]);
@@ -220,9 +218,6 @@ char * comporTramaI(int flag, char * buffer, int length){
   info->frameSend[3] = info->frameSend[1]^info->frameSend[2];
   info->frameSend[4 + length] = 0;
   for(index = 0; index < length; index++){
-    /*
-      ADICIONAR STUFFING E DESTUFFING
-    */
     info->frameSend[4 + index] = buffer[index];
     info->frameSend[4 + length] = info->frameSend[4 + length]^info->frameSend[4 + index];
   }
@@ -285,7 +280,7 @@ int llopen(int porta, int flag){
     info->frameTempLength = readFrame(info->frameTemp);
     if (verifyFrame(info->frameTemp, info->frameTempLength, "set")){
       buildFrame(flag, "ua");
-      transmitirFrame(info->frameSend, info->frameSendLength);
+      //transmitirFrame(info->frameSend, info->frameSendLength);
       return 1;
     }
   }
@@ -297,7 +292,8 @@ int llwrite(int fd, char * buffer, int length){
   
   comporTramaI(TRANSMITTER, buffer, info->lengthDados);
   //printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
-  transmitirFrame(info->frameSend, info->frameSendLength);
+  if(transmitirFrame(info->frameSend, info->frameSendLength) != 0)
+    return 1;
   info->tentativas = info->timeout;
   while(info->tentativas > 0){
     start_alarm();
@@ -311,7 +307,8 @@ int llwrite(int fd, char * buffer, int length){
       }
       else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej0")){
         printf("recebeu rej0\n");
-        transmitirFrame(info->frameSend, info->frameSendLength);
+        if(transmitirFrame(info->frameSend, info->frameSendLength) != 0)
+          return 1;
         continue;
       }
     }
@@ -349,7 +346,7 @@ int llread(int fd, char * buffer){
         sprintf(typeRR, "rr%d", !info->sequenceNumber);
         printf("criar frame de %s \n", typeRR);
         buildFrame(info->flag, typeRR);
-        //transmitirFrame(info->frameSend, info->frameSendLength);
+        transmitirFrame(info->frameSend, info->frameSendLength);
         free(typeRR);
         int j;
         printf("dados recebidos: ");
@@ -383,6 +380,7 @@ int transmitirFrame(char * frame, int length){
     fprintf(stderr,"0x%x ", frame[i]);
   }
   fprintf(stderr,"\n");
+  return res;
 }
 
 void state_machine(int state, char signal, char * type){
