@@ -23,6 +23,12 @@ int main(int argc, char** argv){
   else if (strcmp("1", argv[1])==0){      //Transmitter
     info->flag = TRANSMITTER;
     llopen(atoi(argv[2]), TRANSMITTER);
+    int i;
+    for(i = 0; i < 6; i++){
+      info->dados[i] = i*10;
+      printf("dados[%d] = %x \n", i, info->dados[i]);
+    }
+    info->lengthDados = 6;
     llwrite(info->fd, info->dados, info->lengthDados);
   }
 
@@ -301,6 +307,7 @@ int llwrite(int fd, char * buffer, int length){
         printf("recebeu rr corretamente \n");
         stop_alarm();
         info->tentativas = info->timeout;
+        break;
       }
       else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej0")){
         printf("recebeu rej0\n");
@@ -313,6 +320,7 @@ int llwrite(int fd, char * buffer, int length){
         printf("recebeu rr corretamente \n");
         stop_alarm();
         info->tentativas = info->timeout;
+        break;
       }
       else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej1")){
         printf("recebeu rej1\n");
@@ -341,7 +349,7 @@ int llread(int fd, char * buffer){
         sprintf(typeRR, "rr%d", !info->sequenceNumber);
         printf("criar frame de %s \n", typeRR);
         buildFrame(info->flag, typeRR);
-        transmitirFrame(info->frameSend, info->frameSendLength);
+        //transmitirFrame(info->frameSend, info->frameSendLength);
         free(typeRR);
         int j;
         printf("dados recebidos: ");
