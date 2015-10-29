@@ -80,3 +80,4 @@ void comporPacotesControlo(int c);
 void comporPacotesDados(int seqNumb, int sizeCampoI, int lengthDados, char* dados);
 int transmitirFrame(char * frame, int length);
 void atende(int sig);
+int llwrite(int fd, char * buffer, int length);

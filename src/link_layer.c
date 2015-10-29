@@ -18,10 +18,12 @@ int main(int argc, char** argv){
   if (strcmp("0", argv[1])==0){       //RECEIVER
     info->flag = RECEIVER;
     llopen(atoi(argv[2]), RECEIVER);
+    llread(info->fd, info->dados);
   }
   else if (strcmp("1", argv[1])==0){      //Transmitter
     info->flag = TRANSMITTER;
     llopen(atoi(argv[2]), TRANSMITTER);
+    llwrite(info->fd, info->dados, info->lengthDados);
   }
 
 
@@ -39,6 +41,7 @@ int readFrame(char * frame){
   char buf2 = 0;
   int res2;
   int i = 0;
+  int j = 0;
   int primeiroF = 1; //passa a 0 assim que a primeira FLAG é encontrada
   while(1){
     while((res2 = read(info->fd, &buf2, 1))==0)
@@ -199,6 +202,35 @@ int buildFrame(int flag, char * type){
   return 1;
 }
 
+char * comporTramaI(int flag, char * buffer, int length){
+  int index;
+  info->frameSend[0] = F;
+  if (info->sequenceNumber == 1){
+    info->frameSend[2] = C_I1;
+  }
+  else
+    info->frameSend[2] = C_I0;
+  info->frameSend[1] = campo_endereco(flag, info->frameSend[2]);
+  info->frameSend[3] = info->frameSend[1]^info->frameSend[2];
+  info->frameSend[4 + length] = 0;
+  for(index = 0; index < length; index++){
+    /*
+      ADICIONAR STUFFING E DESTUFFING
+    */
+    info->frameSend[4 + index] = buffer[index];
+    info->frameSend[4 + length] = info->frameSend[4 + length]^info->frameSend[4 + index];
+  }
+  info->frameSend[4 + length + 1] = F;
+
+  int i;
+  for(i = 0; i <= (5+length); i++){
+    printf("I[%d]=%x ", i, info->frameSend[i]);
+  }
+  printf("\n");
+  info->frameSendLength = 6+length;
+  return info->frameSend;
+}
+
 int llopen(int porta, int flag){
 
   sprintf(info->endPorta, "/dev/ttyS%d", porta);
@@ -247,7 +279,7 @@ int llopen(int porta, int flag){
     info->frameTempLength = readFrame(info->frameTemp);
     if (verifyFrame(info->frameTemp, info->frameTempLength, "set")){
       buildFrame(flag, "ua");
-      //transmitirFrame(info->frameSend, info->frameSendLength);
+      transmitirFrame(info->frameSend, info->frameSendLength);
       return 1;
     }
   }
@@ -255,7 +287,85 @@ int llopen(int porta, int flag){
   return info->fd;
 }
 
+int llwrite(int fd, char * buffer, int length){
+  
+  comporTramaI(TRANSMITTER, buffer, info->lengthDados);
+  //printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
+  transmitirFrame(info->frameSend, info->frameSendLength);
+  info->tentativas = info->timeout;
+  while(info->tentativas > 0){
+    start_alarm();
+    info->frameTempLength = readFrame(info->frameTemp);
+    if (info->sequenceNumber == 1){
+      if (verifyFrame(info->frameTemp, info->frameTempLength, "rr0")){
+        printf("recebeu rr corretamente \n");
+        stop_alarm();
+        info->tentativas = info->timeout;
+      }
+      else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej0")){
+        printf("recebeu rej0\n");
+        transmitirFrame(info->frameSend, info->frameSendLength);
+        continue;
+      }
+    }
+    else if (info->sequenceNumber == 0){
+      if (verifyFrame(info->frameTemp, info->frameTempLength, "rr1")){
+        printf("recebeu rr corretamente \n");
+        stop_alarm();
+        info->tentativas = info->timeout;
+      }
+      else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej1")){
+        printf("recebeu rej1\n");
+        transmitirFrame(info->frameSend, info->frameSendLength);
+        continue;
+      }
+    }
+  }
+  printf("retornar llwrite\n");
+  return 1;
+}
 
+int llread(int fd, char * buffer){
+  while(1){
+    info->frameTempLength = readFrame(info->frameTemp);
+    char * type = malloc(5);
+    type = verifyFrameType(info->frameTemp);
+    if (type == "set"){
+      buildFrame(info->flag, "ua");
+      transmitirFrame(info->frameSend, info->frameSendLength);
+      continue;
+    }
+    else if (type == "I0" || type == "I1"){
+      if (verifyFrame(info->frameTemp, info->frameTempLength, type)){
+        char * typeRR = malloc(5);
+        sprintf(typeRR, "rr%d", !info->sequenceNumber);
+        printf("criar frame de %s \n", typeRR);
+        buildFrame(info->flag, typeRR);
+        transmitirFrame(info->frameSend, info->frameSendLength);
+        free(typeRR);
+        int j;
+        printf("dados recebidos: ");
+        for(j = 0; j < (info->frameTempLength-6); j++){
+          info->dados[j] = info->frameTemp[4+j];
+          printf(" %x ", info->dados[j]);
+        }
+        printf("\n");
+        info->lengthDados = j;
+      }
+      else{
+        char * typeREJ = malloc(5);
+        sprintf(typeREJ, "rej%d", !info->sequenceNumber);
+        printf("criar frame de %s \n", typeREJ);
+        buildFrame(info->flag, typeREJ);
+        transmitirFrame(info->frameSend, info->frameSendLength);
+        free(typeREJ);
+      }
+    }
+    break;
+  }
+
+  return 1;
+}
 
 int transmitirFrame(char * frame, int length){
   int i;
@@ -379,8 +489,7 @@ void comporPacotesDados(int seqNumb, int sizeCampoI, int lengthDados, char* dado
   } 
 }
 
-void atende(int sig)                   // atende alarme
-{
+void atende(int sig) {
   printf("alarme # %d\n", conta);
   flag=1;
   conta++;
