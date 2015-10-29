@@ -390,6 +390,7 @@ int llclose_transmitter(int fd){
     if (verifyFrame(info->frameTemp, info->frameTempLength, "disc")){
       buildFrame(info->flag, "ua");
       transmitirFrame(info->frameSend, info->frameSendLength);
+      break;
     }  
   }
 
@@ -447,7 +448,7 @@ int llclose_receiver(int fd){
       type = verifyFrameType(info->frameTemp);
 
       if (verifyFrame(info->frameTemp, info->frameTempLength, "ua")){
-        return 1;
+        break;
       }
     }
     else{
