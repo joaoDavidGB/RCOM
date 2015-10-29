@@ -31,7 +31,7 @@ struct Info {
   int fd; // descritor de ficheiro
   struct termios oldtio; 
   struct termios newtio;
-  char endPorta[20]; /*Dispositivo /dev/ttySx, x = 0, 1*/
+  char * endPorta; /*Dispositivo /dev/ttySx, x = 0, 1*/
   
   int baudRate; /*Velocidade de transmissão*/
   unsigned int sequenceNumber; /*Número de sequência da trama: 0, 1*/

@@ -247,6 +247,8 @@ int llopen(char * porta, int flag){
   printf("sequenceNumber: %d \n", info->sequenceNumber);
   info->tentativas = 3;
 
+  info->endPorta = malloc(255);
+  info->endPorta = porta;
   info->fd = open(info->endPorta, O_RDWR | O_NOCTTY);
   if (info->fd < 0) {perror(info->endPorta); exit(-1);}
 
