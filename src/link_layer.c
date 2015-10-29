@@ -238,6 +238,7 @@ char * comporTramaI(int flag, char * buffer, int length){
 
 int llopen(char * porta, int flag){
 
+  printf("FLAG (TRANS/REC) = %d \n", flag);
   info = malloc(sizeof(struct Info));
   info->dados = malloc(255);
   info->frameTemp = malloc(255);
@@ -564,16 +565,24 @@ void state_machine(int state, char signal, char * type){
 
 int campo_endereco(int role, int c){
   if (role == TRANSMITTER){
-    if (Is_cmd(c))
+    if (Is_cmd(c)){
+      printf("comando transmissor\n");
       return 0x03;
-    else
+    }
+    else{
+      printf("resposta transmissor\n");
       return 0x01;
+    }
   }
   else if (role == RECEIVER){
-    if (Is_cmd(c))
+    if (Is_cmd(c)){
+      printf("comando recetor\n");
       return 0x01;
-    else
+    }
+    else{
+      printf("resposta recetor\n");
       return 0x03;
+    }
   }
 
   printf("fail no campo_endereco \n");

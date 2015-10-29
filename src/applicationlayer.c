@@ -172,6 +172,7 @@ int app_layer_receiver(){
 	for(x = 0; x <= appLayer->numDataPack; x++){
 		int llr = llread(0, appLayer->buf);
 		appLayer->dados = processBuf(appLayer->seqNumb);
+		printf("escrever no ficherio\n");
 		while(!writeToFile(appLayer->dados))
 			continue;
 	}
