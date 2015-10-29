@@ -96,7 +96,7 @@ int app_layer_transmitter(){
 	llopen....
 	*/
 
-	 int llo = llopen(appLayer->porta, appLayer->flag);
+	 int llo = llopen(appLayer->porta, TRANSMITTER);
 	
 
 	for(i=0; i <= appLayer->numDataPack ; i++){
@@ -132,7 +132,7 @@ int app_layer_transmitter(){
 }
 
 int app_layer_receiver(){
-	int llo = llopen(appLayer->porta, appLayer->flag);
+	int llo = llopen(appLayer->porta, RECEIVER);
 	appLayer->dados = malloc(150);
 
 	llread(0, appLayer->buf);
