@@ -389,8 +389,8 @@ int llclose_transmitter(int fd){
     type = verifyFrameType(info->frameTemp);
     if (verifyFrame(info->frameTemp, info->frameTempLength, "disc")){
       buildFrame(info->flag, "ua");
-      transmitirFrame(info->frameSend, info->frameSendLength);
-      break;
+      if(transmitirFrame(info->frameSend, info->frameSendLength))
+        break;
     }  
   }
 
@@ -609,6 +609,7 @@ void atende(int sig) {
     info->tentativas--;
   }
   else{
+    fprintf(stderr, "0 tentativas restantes \n");
     stop_alarm();
   }
 }
