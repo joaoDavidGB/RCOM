@@ -1,7 +1,6 @@
 #include "link_layer.h"
 
 int estado = START;
-int try;
 /*
 int main(int argc, char** argv){
   info = malloc(sizeof(struct Info));
@@ -263,12 +262,14 @@ char * comporTramaI(int flag, char * buffer, int length){
 int llopen(char * porta, int flag){
 
   printf("FLAG (TRANS/REC) = %d \n", flag);
-  
+  info = malloc(sizeof(struct Info));
   info->dados = malloc(255);
   info->frameTemp = malloc(255);
   info->frameSend = malloc(255);
+  info->timeout = 3;
   install_handler(atende, info->timeout);
   printf("sequenceNumber: %d \n", info->sequenceNumber);
+  info->tentativas = 3;
   info->flag = flag;
 
   info->endPorta = malloc(255);
@@ -304,14 +305,13 @@ int llopen(char * porta, int flag){
     printf("llopen de transmissor \n");
     buildFrame(flag, "set");
     transmitirFrame(info->frameSend, info->frameSendLength);
-    try = info->tentativas;
     while(info->tentativas > 0){
       printf("tentativasOpen = %d \n", info->tentativas);
       start_alarm();
       info->frameTempLength = readFrame(info->frameTemp);
       if (verifyFrame(info->frameTemp, info->frameTempLength, "ua")){
         stop_alarm();
-        info->tentativas = try;
+        info->tentativas = 3;
         return 1;
       }
     }
@@ -337,8 +337,7 @@ int llwrite(int fd, char * buffer, int length){
   //printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
   transmitirFrame(info->frameSend, info->frameSendLength);
   printf("enviar frame I com sequenceNumber = %d \n", info->sequenceNumber);
-  //info->tentativas = info->timeout;
-  info->tentativas = try;
+  info->tentativas = info->timeout;
   while(info->tentativas > 0){
     start_alarm();
     info->frameTempLength = readFrame(info->frameTemp);
@@ -346,7 +345,7 @@ int llwrite(int fd, char * buffer, int length){
       if (verifyFrame(info->frameTemp, info->frameTempLength, "rr0")){
         printf("recebeu rr corretamente \n");
         stop_alarm();
-        info->tentativas = try;
+        info->tentativas = info->timeout;
         break;
       }
       else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej0")){
@@ -359,7 +358,7 @@ int llwrite(int fd, char * buffer, int length){
       if (verifyFrame(info->frameTemp, info->frameTempLength, "rr1")){
         printf("recebeu rr corretamente \n");
         stop_alarm();
-        info->tentativas = try;
+        info->tentativas = info->timeout;
         break;
       }
       else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej1")){
@@ -447,7 +446,7 @@ int llread(int fd, char * buffer){
 }
 
 int llclose_transmitter(int fd){
-  info->tentativas = try;
+  info->tentativas = info->timeout;
 
   while(info->tentativas > 0){
     buildFrame(info->flag, "disc");
@@ -475,7 +474,7 @@ int llclose_transmitter(int fd){
 }
 
 int llclose_receiver(int fd){
-  info->tentativas = try;
+  info->tentativas = info->timeout;
   while(1){
     info->frameTempLength = readFrame(info->frameTemp);
     char * type = malloc(5);

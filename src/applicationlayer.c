@@ -3,51 +3,25 @@
 */
 #include "applicationlayer.h"
 
-//#define MAX_FRAME_SIZE 100
+#define MAX_FRAME_SIZE 100
 
 int porta;
 
 int main(int argc, char** argv){
 
-	if(argc != 3){
+	if(argc != 4){
 		printf("numero de argumentos errado. \n");
-		printf("%s (porta(/dev/ttySN)) flag(1-transmitter, 0-receiver) \n", argv[0]);
-		return 0;
+		printf("%s (porta(/dev/ttySN)) ficheiro flag(1-transmitter, 0-receiver) \n", argv[0]);
 	}
 	appLayer = malloc(sizeof(struct applicationLayer));
-	appLayer->flag = atoi(argv[2]);
+	appLayer->flag = atoi(argv[3]);
 	appLayer->porta = argv[1];
 	appLayer->buf = malloc(1000); //escrevemos sempre no mesmo buffer ele é sempre reescrito
-	info = malloc(sizeof(struct Info));
-	//appLayer->filename = argv[2]; //Nome do ficheiro passado como argumento
+	
+	appLayer->filename = argv[2]; //Nome do ficheiro passado como argumento
 
-	if (appLayer->flag == TRANSMITTER){
-		char fileC[20], maxSize[20], tentativasC[5], timeoutC[5], baudRateC[10];
-		printf("File: ");
-		scanf("%s", fileC);
-		int baudRateI;
-		do{
-			printf("Baud Rate: ");
-			scanf("%d", &baudRateI);
-		}while(baudRateI != 300 && baudRateI != 1200 && baudRateI != 2400 && baudRateI != 4800
-			&& baudRateI != 9600 && baudRateI != 19200
-			&& baudRateI != 38400 && baudRateI != 57600 && baudRateI != 115200 && baudRateI != 230400);
-		
-		printf("Max Frame Size: ");
-		scanf("%s", maxSize);
-		printf("tentativas: ");
-		scanf("%s", tentativasC);
-		printf("timeOut: ");
-		scanf("%s", timeoutC);
-		appLayer->filename = fileC;
-		appLayer->MAX_FRAME_SIZE = 2*atoi(maxSize)+2+8+4;
-		info->tentativas = atoi(tentativasC);
-		info->timeout = atoi(timeoutC);
-		info->baudRate = convertBaudrate(baudRateI);
-		printf("Menu results: %s, %d, %d, %d, %d \n", appLayer->filename, appLayer->MAX_FRAME_SIZE, info->tentativas, info->timeout, info->baudRate);
-
+	if (appLayer->flag == TRANSMITTER)
 		app_layer_transmitter();
-	}
 	else if (appLayer->flag == RECEIVER)
 		app_layer_receiver();
 	
@@ -105,7 +79,7 @@ int app_layer_transmitter(){
 
  	printf("file size %d\n", appLayer->filesize);
 
- 	appLayer->lengthDados = (appLayer->MAX_FRAME_SIZE - 2 - 8 -4)/2; 
+ 	appLayer->lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2; 
  	appLayer->numDataPack = (int)(((float)appLayer->filesize)/appLayer->lengthDados+.5);
 
 	int n1 = makeCONTROLpackage(appLayer->buf,1);
@@ -202,7 +176,7 @@ int app_layer_receiver(){
 
 	
 
-	appLayer->lengthDados = (appLayer->MAX_FRAME_SIZE - 2 - 8 -4)/2; 
+	appLayer->lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2; 
  	appLayer->numDataPack = (int)(((float)appLayer->filesize)/appLayer->lengthDados+.5);
  	printf("numDataPack do receiver = %d \n", appLayer->numDataPack);
 
@@ -333,37 +307,6 @@ char* processBuf(unsigned char seqnumb){
 	}
 	return bf;
 
-}
-
-int convertBaudrate(int baudrate){
-	switch(baudrate){
-		case 300:
-			return B300;
-		case 1200:
-			return B1200;
-		case 2400:
-			return B2400;
-		case 4800:
-			return B4800;
-		case 9600:
-			return B9600;
-		//case 14400:
-		//	return B14400;
-		case 19200:
-			return B19200;
-		//case 28800:
-		//	return B28800;
-		case 38400:
-			return B38400;
-		case 57600:
-			return B57600;
-		case 115200:
-			return B115200;
-		case 230400:
-			return B230400;
-		default:
-			return -1;
-	}
 }
 
 
