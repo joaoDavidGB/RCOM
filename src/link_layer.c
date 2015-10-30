@@ -325,6 +325,7 @@ int llwrite(int fd, char * buffer, int length){
   stuffing(info->frameSend, &info->frameSendLength);
   //printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
   transmitirFrame(info->frameSend, info->frameSendLength);
+  printf("enviar frame I com sequenceNumber = %d \n", info->sequenceNumber);
   info->tentativas = info->timeout;
   while(info->tentativas > 0){
     start_alarm();
@@ -379,6 +380,7 @@ int llread(int fd, char * buffer){
 
         if(type == "I0" && !info->sequenceNumber
           || type == "I1" && info->sequenceNumber){
+          printf("recebeu a trama I correspondente aos sequenceNumber %d \n", info->sequenceNumber);
           char * typeRR = malloc(5);
           sprintf(typeRR, "rr%d", !info->sequenceNumber);
           printf("criar frame de %s \n", typeRR);
