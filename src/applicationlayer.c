@@ -119,7 +119,7 @@ int app_layer_transmitter(){
 		*/
 		//llwrite(0, appLayer->buf, datalength);
 
-		int llw = llwrite(appLayer->fd, appLayer->buf, appLayer->lengthDados);
+		int llw = llwrite(appLayer->fd, appLayer->buf,datalength);
 	
 		appLayer->seqNumb++;
 		//if(suc != 0)
