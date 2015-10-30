@@ -9,13 +9,12 @@ int porta;
 
 int main(int argc, char** argv){
 
-	if(argc != 3){
+	if(argc != 2){
 		printf("numero de argumentos errado. \n");
-		printf("%s (porta(/dev/ttySN)) flag(1-transmitter, 0-receiver) \n", argv[0]);
+		printf("%s (porta(/dev/ttySN)) \n", argv[0]);
 		return 0;
 	}
 	appLayer = malloc(sizeof(struct applicationLayer));
-	appLayer->flag = atoi(argv[2]);
 	appLayer->porta = argv[1];
 	appLayer->buf = malloc(1000); //escrevemos sempre no mesmo buffer ele é sempre reescrito
 
