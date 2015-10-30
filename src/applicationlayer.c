@@ -25,7 +25,7 @@ int main(int argc, char** argv){
 		printf("File: ");
 		scanf("%s", fileC);
 	
-		appLayer->filename = &fileC; //Nome do ficheiro perguntado no menu 
+		appLayer->filename = fileC; //Nome do ficheiro perguntado no menu 
 		app_layer_transmitter();
 	}
 	else if (appLayer->flag == RECEIVER)
