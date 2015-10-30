@@ -23,6 +23,7 @@ int main(int argc, char** argv){
 	if (appLayer->flag == TRANSMITTER){
 		char fileC[20];
 		int tentativasC;
+		int timeOutC;
 		printf("File: ");
 		scanf("%s", fileC);
 	
@@ -32,6 +33,11 @@ int main(int argc, char** argv){
 		scanf("%d", &tentativasC);
 
 		tentativas = tentativasC;
+
+		printf("timeOut: ");
+		scanf("%d", &timeOutC);
+
+		timeOut = timeOutC;
 		
 		app_layer_transmitter();
 	}

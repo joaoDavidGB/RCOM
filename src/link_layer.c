@@ -268,7 +268,7 @@ int llopen(char * porta, int flag){
   info->dados = malloc(255);
   info->frameTemp = malloc(255);
   info->frameSend = malloc(255);
-  info->timeout = 3;
+  info->timeout = timeOut;
   install_handler(atende, info->timeout);
   //printf("sequenceNumber: %d \n", info->sequenceNumber);
   info->tentativas = tentativas;
