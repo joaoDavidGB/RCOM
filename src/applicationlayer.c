@@ -244,8 +244,8 @@ int makeCONTROLpackage(char* buf,int c){
 	
 	
 	buf[3 +sizeof(appLayer->filesize)] = 1;
-	buf[4+sizeof(appLayer->filesize)] = sizeof(appLayer->filename);
-	memcpy(buf + 4+sizeof(appLayer->filesize), &appLayer->filename, strlen(appLayer->filename));
+	buf[4+sizeof(appLayer->filesize)] = strlen(appLayer->filename);
+	memcpy(buf + 5 + sizeof(appLayer->filesize), &appLayer->filename, strlen(appLayer->filename));
 
 	return 4+sizeof(appLayer->filesize)+strlen(appLayer->filename);
 }
