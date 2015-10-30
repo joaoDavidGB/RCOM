@@ -131,7 +131,7 @@ int app_layer_transmitter(){
 	appLayer->seqNumb = 0;
 	int i = 0;
 	char * dados = malloc(1000);
-	//printf("numDataPack = %d \n", appLayer->numDataPack);
+	printf("numDataPack = %d \n", appLayer->numDataPack);
 
 	/*
 	llopen....
@@ -219,7 +219,7 @@ int app_layer_receiver(){
 
 	appLayer->lengthDados = (Max_Frame_Size - 2 - 8 -4)/2; 
  	appLayer->numDataPack = (int)(((float)appLayer->filesize)/appLayer->lengthDados+.5);
- 	//printf("numDataPack do receiver = %d \n", appLayer->numDataPack);
+ 	printf("numDataPack do receiver = %d \n", appLayer->numDataPack);
 
  	int x;
 	for(x = 0; x <= appLayer->numDataPack; x++){
