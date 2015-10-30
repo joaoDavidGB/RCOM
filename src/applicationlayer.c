@@ -16,7 +16,8 @@ int main(int argc, char** argv){
 	appLayer = malloc(sizeof(struct applicationLayer));
 	appLayer->flag = atoi(argv[3]);
 	appLayer->porta = argv[1];
-
+	appLayer->buf = malloc(1000); //escrevemos sempre no mesmo buffer ele é sempre reescrito
+	
 	appLayer->filename = argv[2]; //Nome do ficheiro passado como argumento
 
 	if (appLayer->flag == TRANSMITTER)
@@ -81,7 +82,6 @@ int app_layer_transmitter(){
  	appLayer->lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2; 
  	appLayer->numDataPack = (int)(((float)appLayer->filesize)/appLayer->lengthDados+.5);
 
-	appLayer->buf = malloc(1000); //escrevemos sempre no mesmo buffer ele é sempre reescrito
 	int n1 = makeCONTROLpackage(appLayer->buf,1);
 	
 
@@ -90,7 +90,7 @@ int app_layer_transmitter(){
 
 	appLayer->seqNumb = 0;
 	int i = 0;
-	char * dados = malloc(100);
+	char * dados = malloc(1000);
 	printf("numDataPack = %d \n", appLayer->numDataPack);
 
 	/*

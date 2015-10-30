@@ -383,8 +383,9 @@ int llread(int fd, char * buffer){
 
         for(j = 0; j < (info->frameTempLength-6); j++){
           info->dados[j] = info->frameTemp[4+j];
-          printf(" %x ", info->dados[j]);
+          printf(" %x \n", info->dados[j]);
           buffer[j] = info->dados[j];
+           printf(" %x \n", info->dados[j]);
         }
         printf("blee\n");
         info->lengthDados = j;
