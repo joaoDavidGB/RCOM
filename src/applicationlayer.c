@@ -138,14 +138,14 @@ int app_layer_receiver(){
 	int llo = llopen(appLayer->porta, RECEIVER);
 	appLayer->dados = malloc(150);
 
-	printf("ABCcenas\n");
+	
 	llread(RECEIVER, appLayer->buf);
 	if(appLayer->buf[0] != 1){
 		printf("pacote de controlo inicial com campo de controlo errado: %d\n", appLayer->buf[0]);
 		return 0;
 	}
 	int fileSize;
-	printf("ABCcenas2\n");
+	
 
 	int j = 1; 
 	int ite = 0;
@@ -173,7 +173,7 @@ int app_layer_receiver(){
 		return 0;
 	}
 
-	printf("ABCcenas 3\n");
+	
 
 	appLayer->lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2; 
  	appLayer->numDataPack = (int)(((float)appLayer->filesize)/appLayer->lengthDados+.5);

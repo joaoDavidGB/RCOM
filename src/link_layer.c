@@ -211,13 +211,15 @@ int buildFrame(int flag, char * type){
 }
 
 char * comporTramaI(int flag, char * buffer, int length){
-
+/*
   int ecx = 0;
+  
   printf("tamanho dos dados a enviar: %d \n Dados: ", length);
   for(ecx = 0; ecx < length; ecx++){
     printf("%x.", buffer[ecx]);
   }
   printf("\n");
+  */
 
   int index;
   info->frameSend[0] = F;
@@ -234,12 +236,13 @@ char * comporTramaI(int flag, char * buffer, int length){
     info->frameSend[4 + length] = info->frameSend[4 + length]^info->frameSend[4 + index];
   }
   info->frameSend[4 + length + 1] = F;
-
+/*
   int i;
   for(i = 0; i <= (5+length); i++){
     printf("I[%d]=%x ", i, info->frameSend[i]);
   }
   printf("\n");
+  */
   info->frameSendLength = 6+length;
   return info->frameSend;
 }
@@ -387,7 +390,6 @@ int llread(int fd, char * buffer){
           buffer[j] = info->dados[j];
           //printf(" %x \n", info->dados[j]);
         }
-        printf("blee\n");
         info->lengthDados = j;
       }
       else{
