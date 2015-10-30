@@ -117,9 +117,9 @@ int app_layer_transmitter(){
 			Escrever aqui o código que usa o link_layer para enviar os dados
 			llwrite
 		*/
-		llwrite(0, appLayer->buf, datalength);
+		//llwrite(0, appLayer->buf, datalength);
 
-		int llw = llwrite(appLayer->fd, dados, appLayer->lengthDados);
+		int llw = llwrite(appLayer->fd, appLayer->buf, appLayer->lengthDados);
 	
 		appLayer->seqNumb++;
 		//if(suc != 0)
