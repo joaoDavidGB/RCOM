@@ -107,9 +107,9 @@ int app_layer_transmitter(){
 		fprintf(stderr, "lengthDados = %d \n", appLayer->lengthDados);
 
 		do{res = read(appLayer->fd, dados, appLayer->lengthDados); }while(res == 0); //CONFIRMAR SE ESTA A LER PARA OS DADOS!!!!!
-			
 
-		fprintf(stderr, "Dados = %s | res = %d \n", dados, res);
+
+		fprintf(stderr, "\n\n\n\n\nDados = %s | res = %d \n", dados, res);
 
 		int datalength = makeDATApackage(appLayer->buf, appLayer->seqNumb, res, dados);
 
@@ -183,7 +183,7 @@ int app_layer_receiver(){
 	for(x = 0; x <= appLayer->numDataPack; x++){
 		int llr = llread(0, appLayer->buf);
 		appLayer->dados = processBuf(appLayer->seqNumb);
-		printf("escrever no ficherio\n");
+		printf("escrever no ficherio\n\n\n\n");
 		while(!writeToFile(appLayer->dados))
 			continue;
 	}
