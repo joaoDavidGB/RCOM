@@ -19,25 +19,41 @@ int main(int argc, char** argv){
 	appLayer->porta = argv[1];
 	appLayer->buf = malloc(1000); //escrevemos sempre no mesmo buffer ele é sempre reescrito
 
+	while(1){
+		printf("*****MENU*****\n");
+		printf("1) Transmitir\n");
+		printf("2) Receber\n");
+		printf("3) Settings\n");
+		printf("4) Exit\n");
+
+		int option = 0;
+		do{
+			scanf("%d", option);
+		} while(option < 1 || option > 4);
+
+		if (option == 4)
+			return 0;
+		else if (option == 3){
+			changeSettings();
+			continue;
+		}
+		else{
+			Settings(3, 3, 38400, 43);
+			if(option == 1)
+				appLayer->flag = TRANSMITTER;
+			else if (option == 2)
+				appLayer->flag = RECEIVER;
+
+			break;
+		}
+	}
 
 	if (appLayer->flag == TRANSMITTER){
 		char fileC[20];
-		int tentativasC;
-		int timeOutC;
 		printf("File: ");
 		scanf("%s", fileC);
 	
 		appLayer->filename = fileC; //Nome do ficheiro perguntado no menu 
-
-		printf("tentativas: ");
-		scanf("%d", &tentativasC);
-
-		tentativas = tentativasC;
-
-		printf("timeOut: ");
-		scanf("%d", &timeOutC);
-
-		timeOut = timeOutC;
 		
 		app_layer_transmitter();
 	}
@@ -101,7 +117,7 @@ int app_layer_transmitter(){
 
  	//printf("file size: %d\n", appLayer->filesize);
 
- 	appLayer->lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2; 
+ 	appLayer->lengthDados = (Max_Frame_Size - 2 - 8 -4)/2; 
  	appLayer->numDataPack = (int)(((float)appLayer->filesize)/appLayer->lengthDados+.5);
 
 	int n1 = makeCONTROLpackage(appLayer->buf,1);
@@ -199,7 +215,7 @@ int app_layer_receiver(){
 
 	
 
-	appLayer->lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2; 
+	appLayer->lengthDados = (Max_Frame_Size - 2 - 8 -4)/2; 
  	appLayer->numDataPack = (int)(((float)appLayer->filesize)/appLayer->lengthDados+.5);
  	//printf("numDataPack do receiver = %d \n", appLayer->numDataPack);
 
@@ -338,6 +354,72 @@ char* processBuf(unsigned char seqnumb){
 
 }
 
+int changeSettings(){
+	char fileC[20];
+	int tentativasC;
+	int timeOutC;
+	int baudRateC;
+	int max_size; 
+	//printf("File: ");
+	//scanf("%s", fileC);
+
+	//appLayer->filename = fileC; //Nome do ficheiro perguntado no menu 
+	printf("tentativas: ");
+	scanf("%d", &tentativasC);
+
+
+	printf("timeOut: ");
+	scanf("%d", &timeOutC);
+
+
+	printf("BaudRate: ");
+	scanf("%d", &baudRateC);
+	
+
+
+	printf("Max_Frame_Size: ");
+	scanf("%d", &max_size);
+
+	Settings(tentativasC, timeOutC, baudRateC, max_size);
+	return 1;
+	
+}
+
+int Settings(int trys, int timeO, int BR, int FrameSize){
+	tentativas = trys;
+	timeOut = timeO;
+	BaudRate = convertBaudrate(BR);
+	Max_Frame_Size = 2*FrameSize+2+4+8;
+
+	return 1;
+}
+
+int convertBaudrate(int baudrate){
+	switch(baudrate){
+	case 300:
+		return B300;
+	case 1200:
+		return B1200;
+	case 2400:
+		return B2400;
+	case 4800:
+		return B4800;
+	case 9600:
+		return B9600;
+	case 19200:
+		return B19200;
+	case 38400:
+		return B38400;
+	case 57600:
+		return B57600;
+	case 115200:
+		return B115200;
+	case 230400:
+		return B230400;
+	default:
+	 	return -1;
+	 }
+}
 
 
 

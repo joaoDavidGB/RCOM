@@ -286,7 +286,7 @@ int llopen(char * porta, int flag){
 
   bzero(&info->newtio, sizeof(info->newtio));
 
-  info->newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
+  info->newtio.c_cflag = BaudRate | CS8 | CLOCAL | CREAD;
   info->newtio.c_iflag = IGNPAR;
   info->newtio.c_oflag = OPOST;
 

@@ -56,6 +56,8 @@ struct Info {
 //volatile int STOP=FALSE;
 int tentativas;
 int timeOut;
+int Max_Frame_Size;
+int BaudRate;
 unsigned char SET[5];
 unsigned char SET2[5];
 

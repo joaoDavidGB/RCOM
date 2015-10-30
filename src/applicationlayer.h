@@ -34,3 +34,6 @@ int makeCONTROLpackage(char* buf,int c);
 int makeDATApackage(char* buf,int seqNumb, int lengthDados, char* dados);
 int writeToFile(char* dados);
 char* processBuf(unsigned char seqnumb);
+int changeSettings();
+int Settings(int trys, int timeO, int BR, int FrameSize);
+
