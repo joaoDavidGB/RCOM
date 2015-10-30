@@ -25,6 +25,9 @@ struct applicationLayer {
 	unsigned char seqNumb;
 	char * dados;
 	char * porta;
+
+	int MAX_FRAME_SIZE;
+	int timeOut;
 };
 
 struct applicationLayer * appLayer;

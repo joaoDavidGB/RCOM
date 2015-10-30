@@ -262,7 +262,7 @@ char * comporTramaI(int flag, char * buffer, int length){
 int llopen(char * porta, int flag){
 
   printf("FLAG (TRANS/REC) = %d \n", flag);
-  info = malloc(sizeof(struct Info));
+  
   info->dados = malloc(255);
   info->frameTemp = malloc(255);
   info->frameSend = malloc(255);
@@ -284,7 +284,7 @@ int llopen(char * porta, int flag){
 
   bzero(&info->newtio, sizeof(info->newtio));
 
-  info->newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
+  info->newtio.c_cflag = info->baudRate | CS8 | CLOCAL | CREAD;
   info->newtio.c_iflag = IGNPAR;
   info->newtio.c_oflag = OPOST;
 
