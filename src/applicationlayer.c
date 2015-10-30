@@ -159,8 +159,10 @@ int app_layer_receiver(){
 		else if (appLayer->buf[j] == 1){
 			octSize = appLayer->buf[j+1];
 			memcpy(appLayer->filename, appLayer->buf+(j+2), octSize);
+			appLayer->filename[octSize] = 0;
+			printf("received filename %s\n", appLayer->filename);
 		}
-		j+= 1+octSize;
+		j+= 2+octSize;
 	}
 
 	appLayer->fd=0;
