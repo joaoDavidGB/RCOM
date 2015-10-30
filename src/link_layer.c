@@ -370,6 +370,10 @@ int llwrite(int fd, char * buffer, int length){
       }
     }
   }
+  if (info->tentativas == 0){
+	printf("Número de tentativas chegou ao fim. \n");
+	exit(-1);
+  }
   info->sequenceNumber = !info->sequenceNumber;
   //printf("retornar llwrite\n");
   return 1;
