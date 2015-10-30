@@ -72,6 +72,9 @@ int main(int argc, char** argv){
 	if(n2!=0)
 		return 0;
 */
+	free(appLayer->buf);
+	free(appLayer);
+
 	return 1;
 }
 
@@ -152,8 +155,6 @@ int app_layer_transmitter(){
 
 
 	int llc = llclose_transmitter(appLayer->fd);
-	
-
 }
 
 int app_layer_receiver(){
