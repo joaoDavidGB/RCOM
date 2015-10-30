@@ -155,11 +155,12 @@ int app_layer_receiver(){
 			octSize = appLayer->buf[j+1];
 			printf("octSize do fileSize: %d \n", octSize);
 			memcpy(&appLayer->filesize, appLayer->buf+(j+2), octSize);
+			printf("fileSize: %d \n", appLayer->filesize);
 		}
 		else if (appLayer->buf[j] == 1){
 			octSize = appLayer->buf[j+1];
 			memcpy(appLayer->filename, appLayer->buf+(j+2), octSize);
-			appLayer->filename[octSize] = 0;
+			appLayer->filename[octSize+1] = 0;
 			printf("received filename %s\n", appLayer->filename);
 		}
 		j+= 2+octSize;
@@ -245,7 +246,7 @@ int makeCONTROLpackage(char* buf,int c){
 	
 	buf[3 +sizeof(appLayer->filesize)] = 1;
 	buf[4+sizeof(appLayer->filesize)] = strlen(appLayer->filename);
-	memcpy(buf + 5 + sizeof(appLayer->filesize), &appLayer->filename, strlen(appLayer->filename));
+	memcpy(buf + 5 + sizeof(appLayer->filesize), appLayer->filename, strlen(appLayer->filename));
 
 	return 4+sizeof(appLayer->filesize)+strlen(appLayer->filename);
 }
