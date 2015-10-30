@@ -304,7 +304,7 @@ int llopen(char * porta, int flag){
     printf("llopen de transmissor \n");
     buildFrame(flag, "set");
     transmitirFrame(info->frameSend, info->frameSendLength);
-    //try = info->tentativas;
+    try = info->tentativas;
     while(info->tentativas > 0){
       printf("tentativasOpen = %d \n", info->tentativas);
       start_alarm();
