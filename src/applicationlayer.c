@@ -23,25 +23,25 @@ int main(int argc, char** argv){
 	if (appLayer->flag == TRANSMITTER){
 		char fileC[20], maxSize[20], tentativasC[5], timeoutC[5], baudRateC[10];
 		printf("File: ");
-		scanf("%s", &fileC);
+		scanf("%s", fileC);
 		do{
 			printf("Baud Rate: ");
-			scanf("%s", &baudRateC);
-		}while(baudRate != 300 && baudRate != 1200 && baudRate != 2400 && baudRate != 4800
-			&& baudRate != 9600 && baudRate != 14400 && baudRate != 19200 && baudRate != 28800
-			&& baudRate != 38400 && baudRate != 57600 && baudRate != 115200 && baudRate != 230400)
+			scanf("%s", baudRateC);
+		}while(baudRateC != "300" && baudRateC != "1200" && baudRateC != "2400" && baudRateC != "4800"
+			&& baudRateC != "9600" && baudRateC != "14400" && baudRateC != "19200" && baudRateC != "28800"
+			&& baudRateC != "38400" && baudRateC != "57600" && baudRateC != "115200" && baudRateC != "230400");
 		printf("Max Frame Size: ");
-		scanf("%s", &maxSize);
+		scanf("%s", maxSize);
 		printf("tentativas: ");
-		scanf("%s", &tentativasC);
+		scanf("%s", tentativasC);
 		printf("timeOut: ");
-		scanf("%s", &timeOutC);
+		scanf("%s", timeoutC);
 		appLayer->filename = fileC;
 		appLayer->MAX_FRAME_SIZE = 2*atoi(maxSize)+2+8+4;
 		info->tentativas = atoi(tentativasC);
-		info->timeOut = atoi(timeoutC);
+		info->timeout = atoi(timeoutC);
 		info->baudRate = atoi(baudRateC);
-		printf("Menu results: %s, %d, %d, %d, %d \n", appLayer->filename, appLayer->MAX_FRAME_SIZE, info->tentativas, info->timeOut, info->baudRate);
+		printf("Menu results: %s, %d, %d, %d, %d \n", appLayer->filename, appLayer->MAX_FRAME_SIZE, info->tentativas, info->timeout, info->baudRate);
 
 		app_layer_transmitter();
 	}
