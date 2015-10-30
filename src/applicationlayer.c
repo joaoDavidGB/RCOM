@@ -27,7 +27,7 @@ int main(int argc, char** argv){
 
 		int option = 0;
 		do{
-			scanf("%d", option);
+			scanf("%d", &option);
 		} while(option < 1 || option > 4);
 
 		if (option == 4)
