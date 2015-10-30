@@ -62,7 +62,7 @@ int readFrame(char * frame){
 
     //start_alarm();
 
-    printf(" %x ", buf2);
+    printf("0x%02x ", buf2);
     
 
     if (buf2 == F){
@@ -160,7 +160,7 @@ int verifyFrame(char * frame, int length, char * type){
       else if (i == (length - 2)){
         if (frame[i] != BBC2){
 
-          printf("\n\n\n\nBCC2 devia ser %d, mas é %d\n\n\n\n\n", BBC2, frame[i]);
+          printf("\n\n\n\nBCC2 devia ser 0x%02x, mas é 0x%02x\n\n\n\n\n", BBC2, frame[i]);
           return 0;
         }
       }
