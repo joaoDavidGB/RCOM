@@ -379,13 +379,14 @@ int llread(int fd, char * buffer){
         printf("dados recebidos: \n");
         free(typeRR);
         int j;
-        printf("->dados recebidos: \n");
+        printf("frameTempLength: %d\n", info->frameTempLength);
+
         for(j = 0; j < (info->frameTempLength-6); j++){
           info->dados[j] = info->frameTemp[4+j];
           printf(" %x ", info->dados[j]);
           buffer[j] = info->dados[j];
         }
-        printf("\n");
+        printf("blee\n");
         info->lengthDados = j;
       }
       else{

@@ -233,6 +233,8 @@ int makeCONTROLpackage(char* buf,int c){
 	else
 		return 0;
 
+	printf("fileSize: %d \n", appLayer->filesize);
+
 	//primeiro é enviado o tamanho e depois o nome
 	buf[1] = 0;
 	buf[2] = sizeof(appLayer->filesize);
