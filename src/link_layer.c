@@ -140,7 +140,7 @@ int verifyFrame(char * frame, int length, char * type){
   char BBC2 = 0;
   for(i = 0; i < length; i++){
 
-   printf("verifyFrame %s[%d]: %x \n", type, i, frame[i]);
+   //printf("verifyFrame %s[%d]: %x \n", type, i, frame[i]);
 
     if (type != "I0" && type != "I1"){
       if (length != 5){
