@@ -391,7 +391,7 @@ int Settings(int trys, int timeO, int BR, int FrameSize){
 	tentativas = trys;
 	timeOut = timeO;
 	BaudRate = convertBaudrate(BR);
-	Max_Frame_Size = 2*FrameSize+2+4+8;
+	Max_Frame_Size = FrameSize;
 
 	return 1;
 }
