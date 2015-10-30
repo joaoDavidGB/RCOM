@@ -9,20 +9,25 @@ int porta;
 
 int main(int argc, char** argv){
 
-	if(argc != 4){
+	if(argc != 3){
 		printf("numero de argumentos errado. \n");
-		printf("%s (porta(/dev/ttySN)) ficheiro flag(1-transmitter, 0-receiver) \n", argv[0]);
+		printf("%s (porta(/dev/ttySN)) flag(1-transmitter, 0-receiver) \n", argv[0]);
 		return 0;
 	}
 	appLayer = malloc(sizeof(struct applicationLayer));
 	appLayer->flag = atoi(argv[3]);
 	appLayer->porta = argv[1];
 	appLayer->buf = malloc(1000); //escrevemos sempre no mesmo buffer ele é sempre reescrito
-	
-	appLayer->filename = argv[2]; //Nome do ficheiro passado como argumento
 
-	if (appLayer->flag == TRANSMITTER)
+
+	if (appLayer->flag == TRANSMITTER){
+		char fileC[20];
+		printf("File: ");
+		scanf("%s", fileC);
+	
+		appLayer->filename = &fileC; //Nome do ficheiro perguntado no menu 
 		app_layer_transmitter();
+	}
 	else if (appLayer->flag == RECEIVER)
 		app_layer_receiver();
 	
