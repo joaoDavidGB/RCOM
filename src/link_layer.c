@@ -387,6 +387,12 @@ int llread(int fd, char * buffer){
     }
     else if (type == "I0" || type == "I1"){
       destuffing(info->frameTemp, &info->frameTempLength);
+        fprintf(stderr,"Destuffing ");
+        int bb;
+        for(bb = 0; bb < info->frameTempLength; bb++){
+          fprintf(stderr,"0x%x ", info->frameTemp[bb]);
+        }
+        fprintf(stderr,"\n");
       if (verifyFrame(info->frameTemp, info->frameTempLength, type)){
 
         if(type == "I0" && !info->sequenceNumber
