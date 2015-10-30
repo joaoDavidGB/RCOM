@@ -70,7 +70,7 @@ int readFrame(char * frame){
         if (i < 4){ //se a trama não tiver pelo menos 5 chars é invalida e começa a ler outra
           i = 1;
           frame[0] = buf2;
-          primeiroF=1;
+          continue;
         }
         else{ //se a trama tiver tamanho 5 ou superior termina
           frame[i] = buf2;
