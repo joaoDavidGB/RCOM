@@ -12,6 +12,7 @@ int main(int argc, char** argv){
 	if(argc != 3){
 		printf("numero de argumentos errado. \n");
 		printf("%s (porta(/dev/ttySN)) flag(1-transmitter, 0-receiver) \n", argv[0]);
+		return 0;
 	}
 	appLayer = malloc(sizeof(struct applicationLayer));
 	appLayer->flag = atoi(argv[2]);
@@ -27,9 +28,9 @@ int main(int argc, char** argv){
 		do{
 			printf("Baud Rate: ");
 			scanf("%s", baudRateC);
-		}while(baudRateC != "300" && baudRateC != "1200" && baudRateC != "2400" && baudRateC != "4800"
-			&& baudRateC != "9600" && baudRateC != "14400" && baudRateC != "19200" && baudRateC != "28800"
-			&& baudRateC != "38400" && baudRateC != "57600" && baudRateC != "115200" && baudRateC != "230400");
+		}while(baudRateC != "300" || baudRateC != "1200" || baudRateC != "2400" || baudRateC != "4800"
+			&& baudRateC != "9600" || baudRateC != "14400" || baudRateC != "19200" || baudRateC != "28800"
+			&& baudRateC != "38400" || baudRateC != "57600" || baudRateC != "115200" || baudRateC != "230400");
 		printf("Max Frame Size: ");
 		scanf("%s", maxSize);
 		printf("tentativas: ");
