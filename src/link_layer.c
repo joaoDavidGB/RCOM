@@ -714,13 +714,13 @@ void destuffing(unsigned char* frame, unsigned int* size){
   for (i = 1; i < (*size-1); i++){
     if(frame[i] == 0x7d && frame[++i] == 0x5e){
       
-       memmove(frame + i + 1, frame + i + 2, *size-i-1);
+       memmove(frame + i, frame + i + 1, *size-i);
        frame[i] = 0x7e;
       (*size--);
     }
     else if (frame[i] == 0x7d && frame[++i]== 0x5d){
       
-      memmove(frame + i + 1, frame + i + 2, *size-i-1);
+      memmove(frame + i , frame + i + 1, *size-i);
       frame[i] = 0x7d;
      (*size--);
     }
