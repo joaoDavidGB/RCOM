@@ -18,6 +18,7 @@ int main(int argc, char** argv){
 	appLayer->porta = argv[1];
 	appLayer->buf = malloc(1000); //escrevemos sempre no mesmo buffer ele é sempre reescrito
 
+	int alterouOption = 0;
 	while(1){
 		printf("*****MENU*****\n");
 		printf("1) Transmitir\n");
@@ -34,10 +35,12 @@ int main(int argc, char** argv){
 			return 0;
 		else if (option == 3){
 			changeSettings();
+			alterouOption = 1;
 			continue;
 		}
 		else{
-			Settings(3, 3, 38400, 43);
+			if (!alterouOption)
+				Settings(3, 3, 38400, 43);
 			if(option == 1)
 				appLayer->flag = TRANSMITTER;
 			else if (option == 2)
