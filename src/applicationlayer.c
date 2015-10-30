@@ -183,15 +183,13 @@ int app_layer_receiver(){
 	for(x = 0; x <= appLayer->numDataPack; x++){
 		int llr = llread(0, appLayer->buf);
 		appLayer->dados = processBuf(appLayer->seqNumb);
-		if (appLayer->dados == "rip"){
-			break;
-		}
 
 		printf("escrever no ficherio\n\n\n\n");
 		while(!writeToFile(appLayer->dados))
 			continue;
 		appLayer->seqNumb++;
 	}
+	printf("acabaram\n");
 
 	llread(0, appLayer->buf);
 
@@ -236,10 +234,12 @@ int app_layer_receiver(){
 // Cria control packages que são enviadas no antes e depois da transferência de dados
 int makeCONTROLpackage(char* buf,int c){
 
-	if (c == 1 || c == 2)
+	if (c == 1 || c == 2){
 	  	buf[0] = c; // pacote enviado no início (start) e no final (end)
-	else
+	}
+	else{
 		return 0;
+	}
 
 	printf("fileSize: %d \n", appLayer->filesize);
 
@@ -252,6 +252,13 @@ int makeCONTROLpackage(char* buf,int c){
 	buf[3 +sizeof(appLayer->filesize)] = 1;
 	buf[4+sizeof(appLayer->filesize)] = strlen(appLayer->filename);
 	memcpy(buf + 5 + sizeof(appLayer->filesize), appLayer->filename, strlen(appLayer->filename));
+
+	int i = 0;
+	printf("trama de controlo %d: ", c);
+	for (i = 0; i < (4+sizeof(appLayer->filesize)+strlen(appLayer->filename)+1); i++){
+		printf("buf[%d] = %x", i, buf[i]);
+	}
+	printf("\n");
 
 	return 4+sizeof(appLayer->filesize)+strlen(appLayer->filename)+1;
 }
@@ -287,7 +294,7 @@ char* processBuf(unsigned char seqnumb){
 	if(appLayer->buf[0] != 0)
 		return 0;
 
-	if(appLayer->buf[1] != seqnumb){
+	if(appLayer->buf[1] != (char)seqnumb){
 		printf("rip seqnumb. buf[1] = 0x%x em vez de seqnumb = 0x%x\n", appLayer->buf[1], seqnumb);
 		return "rip";
 	}
