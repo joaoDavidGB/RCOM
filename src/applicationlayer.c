@@ -83,7 +83,7 @@ int app_layer_transmitter(){
 
 	appLayer->buf = malloc(100); //escrevemos sempre no mesmo buffer ele é sempre reescrito
 	int n1 = makeCONTROLpackage(appLayer->buf,1);
-	llwrite(0, appLayer->buf, n1);
+	
 
 	if(n1==0)
 		return 0;
@@ -99,6 +99,8 @@ int app_layer_transmitter(){
 
 	 int llo = llopen(appLayer->porta, TRANSMITTER);
 	
+	llwrite(1, appLayer->buf, n1);
+	printf("enviou o crtlPacket");
 
 	for(i=0; i <= appLayer->numDataPack ; i++){
 		int res;
@@ -137,7 +139,7 @@ int app_layer_receiver(){
 	appLayer->dados = malloc(150);
 
 	printf("ABCcenas\n");
-	llread(0, appLayer->buf);
+	llread(RECEIVER, appLayer->buf);
 	if(appLayer->buf[0] != 1){
 		printf("pacote de controlo inicial com campo de controlo errado: %d\n", appLayer->buf[0]);
 		return 0;

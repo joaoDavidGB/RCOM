@@ -376,9 +376,10 @@ int llread(int fd, char * buffer){
         printf("criar frame de %s \n", typeRR);
         buildFrame(info->flag, typeRR);
         transmitirFrame(info->frameSend, info->frameSendLength);
-        //free(typeRR);
+        printf("dados recebidos: \n");
+        free(typeRR);
         int j;
-        printf("dados recebidos: ");
+        printf("->dados recebidos: \n");
         for(j = 0; j < (info->frameTempLength-6); j++){
           info->dados[j] = info->frameTemp[4+j];
           printf(" %x ", info->dados[j]);
@@ -393,7 +394,7 @@ int llread(int fd, char * buffer){
         printf("criar frame de %s \n", typeREJ);
         buildFrame(info->flag, typeREJ);
         transmitirFrame(info->frameSend, info->frameSendLength);
-        //free(typeREJ);
+        free(typeREJ);
       }
     }
     break;
