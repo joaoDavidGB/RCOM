@@ -68,8 +68,8 @@ int readFrame(char * frame){
     if (buf2 == F){
       if (!primeiroF){  //se não for a primeira FLAG, será a ultima e termina
         if (i < 4){ //se a trama não tiver pelo menos 5 chars é invalida e começa a ler outra
-          i = 0;
-          frame[i] = buf2;
+          i = 1;
+          frame[0] = buf2;
         }
         else{ //se a trama tiver tamanho 5 ou superior termina
           frame[i] = buf2;
