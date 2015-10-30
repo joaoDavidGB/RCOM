@@ -687,6 +687,7 @@ void atende(int sig) {
   else{
     fprintf(stderr, "0 tentativas restantes \n");
     stop_alarm();
+    exit(-1);
   }
 }
 
