@@ -714,15 +714,20 @@ void destuffing(unsigned char* frame, unsigned int* size){
   for (i = 1; i < (*size-1); i++){
     if(frame[i] == 0x7d && frame[i+1] == 0x5e){
       
-       memmove(frame + i + 1, frame + i + 2, *size-i-1);
+       memmove(frame + i + 1, frame + i + 2, *size-i-2);
        frame[i] = 0x7e;
-      (*size--);
+      (*size)--;
     }
     else if (frame[i] == 0x7d && frame[i+1]== 0x5d){
       
-      memmove(frame + i + 1, frame + i + 2, *size-i-1);
-      frame[i] = 0x7d;
-     (*size--);
+      memmove(frame + i + 1, frame + i + 2, *size-i-2);
+      //frame[i] = 0x7d;
+     (*size)--;
+     printf("SIZE  DSF: %x\n", frame[i+1]);
+     printf("SIZE  DSF: %d\n", *size);
+       printf("i  DSF: %d\n", i);
     }
+
   }
+   printf("SAIU DO FOR!!!!!\n");
 }

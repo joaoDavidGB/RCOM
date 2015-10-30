@@ -183,6 +183,9 @@ int app_layer_receiver(){
 	for(x = 0; x <= appLayer->numDataPack; x++){
 		int llr = llread(0, appLayer->buf);
 		appLayer->dados = processBuf(appLayer->seqNumb);
+		if (appLayer->dados == "rip"){
+			break;
+		}
 
 		printf("escrever no ficherio\n\n\n\n");
 		while(!writeToFile(appLayer->dados))
@@ -286,7 +289,7 @@ char* processBuf(unsigned char seqnumb){
 
 	if(appLayer->buf[1] != seqnumb){
 		printf("rip seqnumb\n");
-		//return 0;
+		return "rip";
 	}
 
 	char * bf = malloc(150);
