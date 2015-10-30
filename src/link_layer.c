@@ -479,6 +479,7 @@ int llclose_transmitter(int fd){
 	exit(-1);
   }
 
+   sleep(1);
     if ( tcsetattr(info->fd,TCSANOW,&info->oldtio) == -1) {
       perror("tcsetattr");
       return -1;
