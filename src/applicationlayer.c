@@ -83,6 +83,7 @@ int app_layer_transmitter(){
 
 	appLayer->buf = malloc(100); //escrevemos sempre no mesmo buffer ele é sempre reescrito
 	int n1 = makeCONTROLpackage(appLayer->buf,1);
+	llwrite(0, appLayer->buf, n1);
 
 	if(n1==0)
 		return 0;
@@ -232,16 +233,15 @@ int makeCONTROLpackage(char* buf,int c){
 
 	//primeiro é enviado o tamanho e depois o nome
 	buf[1] = 0;
-	int n = appLayer->filesize;
-	buf[2] = 4;
-	memcpy(buf + 3, &n, sizeof(int));
+	buf[2] = sizeof(appLayer->filesize);
+	memcpy(buf + 3, &appLayer->filesize, sizeof(appLayer->filesize));
 	
 	
-	buf[7] = 1;
-	buf[8] = sizeof(appLayer->filename);
-	memcpy(buf + 8, &appLayer->filename, strlen(appLayer->filename));
+	buf[3 +sizeof(appLayer->filesize)] = 1;
+	buf[4+sizeof(appLayer->filesize)] = sizeof(appLayer->filename);
+	memcpy(buf + 4+sizeof(appLayer->filesize), &appLayer->filename, strlen(appLayer->filename));
 
-	return 1;
+	return buf + 4+sizeof(appLayer->filesize)+strlen(appLayer->filename);
 }
 
 // Cria data package que envia o ficheiro
