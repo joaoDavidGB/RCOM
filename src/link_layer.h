@@ -54,7 +54,7 @@ struct Info {
 };
 
 //volatile int STOP=FALSE;
-
+int tentativas;
 unsigned char SET[5];
 unsigned char SET2[5];
 

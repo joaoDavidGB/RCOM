@@ -22,10 +22,17 @@ int main(int argc, char** argv){
 
 	if (appLayer->flag == TRANSMITTER){
 		char fileC[20];
+		int tentativasC;
 		printf("File: ");
 		scanf("%s", fileC);
 	
 		appLayer->filename = fileC; //Nome do ficheiro perguntado no menu 
+
+		printf("tentativas: ");
+		scanf("%d", &tentativasC);
+
+		tentativas = tentativasC;
+		
 		app_layer_transmitter();
 	}
 	else if (appLayer->flag == RECEIVER)
