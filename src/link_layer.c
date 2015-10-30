@@ -356,6 +356,7 @@ int llwrite(int fd, char * buffer, int length){
       }
     }
   }
+  info->sequenceNumber = !info->sequenceNumber;
   printf("retornar llwrite\n");
   return 1;
 }
