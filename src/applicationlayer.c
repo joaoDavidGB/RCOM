@@ -12,6 +12,7 @@ int main(int argc, char** argv){
 	if(argc != 4){
 		printf("numero de argumentos errado. \n");
 		printf("%s (porta(/dev/ttySN)) ficheiro flag(1-transmitter, 0-receiver) \n", argv[0]);
+		return 0;
 	}
 	appLayer = malloc(sizeof(struct applicationLayer));
 	appLayer->flag = atoi(argv[3]);
@@ -57,27 +58,27 @@ int main(int argc, char** argv){
 }
 
 int app_layer_transmitter(){
-	printf("ficheiro aberto: %s \n", appLayer->filename);
  	appLayer->fd=0;
  	if((appLayer->fd=open(appLayer->filename,O_RDONLY,0666)) < 0)
  		return 0;
 
-	printf("LEU O FICHEIRO!\n");
+	printf("ficheiro aberto: %s \n", appLayer->filename);
+	//printf("LEU O FICHEIRO!\n");
 
 	struct stat fileStat;
 
 	if(fstat(appLayer->fd,&fileStat) < 0){ 
- 		printf("DEU ASNEIRA FSTAT\n");   
+ 		printf("Erro no FSTAT\n");   
  		return 0;
  	}
 
  	appLayer->filesize = fileStat.st_size;		
  	if (appLayer->filesize < 0){
- 		printf("DEU ASNEIRA file size\n");
+ 		printf("Erro no file size\n");
  		return 0;
  	}
 
- 	printf("file size %d\n", appLayer->filesize);
+ 	//printf("file size: %d\n", appLayer->filesize);
 
  	appLayer->lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2; 
  	appLayer->numDataPack = (int)(((float)appLayer->filesize)/appLayer->lengthDados+.5);
@@ -91,7 +92,7 @@ int app_layer_transmitter(){
 	appLayer->seqNumb = 0;
 	int i = 0;
 	char * dados = malloc(1000);
-	printf("numDataPack = %d \n", appLayer->numDataPack);
+	//printf("numDataPack = %d \n", appLayer->numDataPack);
 
 	/*
 	llopen....
@@ -100,16 +101,16 @@ int app_layer_transmitter(){
 	 int llo = llopen(appLayer->porta, TRANSMITTER);
 	
 	llwrite(1, appLayer->buf, n1);
-	printf("enviou o crtlPacket");
+	//printf("enviou o crtlPacket");
 
 	for(i=0; i <= appLayer->numDataPack ; i++){
 		int res;
-		fprintf(stderr, "lengthDados = %d \n", appLayer->lengthDados);
+		//fprintf(stderr, "lengthDados = %d \n", appLayer->lengthDados);
 
 		do{res = read(appLayer->fd, dados, appLayer->lengthDados); }while(res == 0); //CONFIRMAR SE ESTA A LER PARA OS DADOS!!!!!
 
 
-		fprintf(stderr, "\n\n\n\n\nDados = %s | res = %d \n", dados, res);
+		//fprintf(stderr, "\n\n\n\n\nDados = %s | res = %d \n", dados, res);
 
 		int datalength = makeDATApackage(appLayer->buf, appLayer->seqNumb, res, dados);
 
@@ -120,6 +121,8 @@ int app_layer_transmitter(){
 		//llwrite(0, appLayer->buf, datalength);
 
 		int llw = llwrite(appLayer->fd, appLayer->buf,datalength);
+
+		printf("Percentagem de dados enviados: %f  %\n", ((float)i*appLayer->numDataPack)/100);
 	
 		appLayer->seqNumb++;
 		//if(suc != 0)
@@ -154,15 +157,15 @@ int app_layer_receiver(){
 	for(ite = 0; ite < 2; ite++){
 		if (appLayer->buf[j] == 0){
 			octSize = appLayer->buf[j+1];
-			printf("octSize do fileSize: %d \n", octSize);
+			//printf("octSize do fileSize: %d \n", octSize);
 			memcpy(&appLayer->filesize, appLayer->buf+(j+2), octSize);
-			printf("fileSize: %d \n", appLayer->filesize);
+			//printf("fileSize: %d \n", appLayer->filesize);
 		}
 		else if (appLayer->buf[j] == 1){
 			octSize = appLayer->buf[j+1];
 			memcpy(appLayer->filename, appLayer->buf+(j+2), octSize);
 			appLayer->filename[octSize] = 0;
-			printf("received filename %s\n", appLayer->filename);
+			//printf("received filename %s\n", appLayer->filename);
 		}
 		j+= 2+octSize;
 	}
@@ -178,19 +181,23 @@ int app_layer_receiver(){
 
 	appLayer->lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2; 
  	appLayer->numDataPack = (int)(((float)appLayer->filesize)/appLayer->lengthDados+.5);
- 	printf("numDataPack do receiver = %d \n", appLayer->numDataPack);
+ 	//printf("numDataPack do receiver = %d \n", appLayer->numDataPack);
 
  	int x;
 	for(x = 0; x <= appLayer->numDataPack; x++){
 		int llr = llread(0, appLayer->buf);
 		appLayer->dados = processBuf(appLayer->seqNumb);
-
-		printf("escrever no ficherio\n\n\n\n");
+		if (appLayer->dados == "rip" || appLayer->dados == 0){
+			x--;
+			continue;
+		}
+		printf("Percentagem de dados recebidos: %f  %\n", ((float)x*appLayer->numDataPack)/100);
+		//printf("escrever no ficherio\n\n\n\n");
 		while(!writeToFile(appLayer->dados))
 			continue;
 		appLayer->seqNumb++;
 	}
-	printf("acabaram\n");
+	//printf("acabaram\n");
 
 	llread(0, appLayer->buf);
 
@@ -199,7 +206,7 @@ int app_layer_receiver(){
 		return 0;
 	}
 	else{
-		printf("ultimo pacote lido\n");
+		//printf("ultimo pacote lido\n");
 	}
 
 
@@ -223,8 +230,10 @@ int app_layer_receiver(){
 
 	int llc = llclose_receiver(appLayer->fd);
 
+	printf("Número de pacotes perdidos: %d \n", info->lostPack);
+
 	if (llc){
-		printf("llclose_receiver funcionou \n");
+		//printf("llclose_receiver funcionou \n");
 		return 1;
 	}
 	else
@@ -242,7 +251,7 @@ int makeCONTROLpackage(char* buf,int c){
 		return 0;
 	}
 
-	printf("fileSize: %d \n", appLayer->filesize);
+	//printf("fileSize: %d \n", appLayer->filesize);
 
 	//primeiro é enviado o tamanho e depois o nome
 	buf[1] = 0;
@@ -254,12 +263,12 @@ int makeCONTROLpackage(char* buf,int c){
 	buf[4+sizeof(appLayer->filesize)] = strlen(appLayer->filename);
 	memcpy(buf + 5 + sizeof(appLayer->filesize), appLayer->filename, strlen(appLayer->filename));
 
-	int i = 0;
-	printf("trama de controlo %d: ", c);
-	for (i = 0; i < (4+sizeof(appLayer->filesize)+strlen(appLayer->filename)+1); i++){
+	//int i = 0;
+	//printf("trama de controlo %d: ", c);
+	/*for (i = 0; i < (4+sizeof(appLayer->filesize)+strlen(appLayer->filename)+1); i++){
 		printf("buf[%d] = %x", i, buf[i]);
 	}
-	printf("\n");
+	printf("\n");*/
 
 	return 4+sizeof(appLayer->filesize)+strlen(appLayer->filename)+1;
 }
@@ -280,9 +289,9 @@ int makeDATApackage(char* buf,int seqNumb, int lengthDados, char* dados){
 int writeToFile(char* dados){
 
 	int res = write(appLayer->fd, dados,  256 * appLayer->buf[2] + appLayer->buf[3]);
-	printf("Writing to ficherio %d\n", 256 * appLayer->buf[2] + appLayer->buf[3]);
+	//printf("Writing to ficherio %d\n", 256 * appLayer->buf[2] + appLayer->buf[3]);
 	write(STDIN_FILENO, dados,  256 * appLayer->buf[2] + appLayer->buf[3]);
-	printf("\ndone writing to ficherio\n");
+	//printf("\ndone writing to ficherio\n");
 	if(res == 0)
 		return 0;
 
@@ -296,7 +305,7 @@ char* processBuf(unsigned char seqnumb){
 		return 0;
 
 	if(appLayer->buf[1] != (char)seqnumb){
-		printf("rip seqnumb. buf[1] = 0x%x em vez de seqnumb = 0x%x\n", appLayer->buf[1], seqnumb);
+		//printf("rip seqnumb. buf[1] = 0x%x em vez de seqnumb = 0x%x\n", appLayer->buf[1], seqnumb);
 		return "rip";
 	}
 

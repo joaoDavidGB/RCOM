@@ -49,6 +49,8 @@ struct Info {
   char * frameSend;
   int frameSendLength;
 
+  int lostPack;
+
 };
 
 //volatile int STOP=FALSE;

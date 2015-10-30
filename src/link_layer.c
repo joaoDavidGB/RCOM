@@ -52,7 +52,7 @@ int readFrame(char * frame){
   int i = 0;
   int j = 0;
   int primeiroF = 1; //passa a 0 assim que a primeira FLAG é encontrada
-  printf("Received: ");
+  //printf("Received: ");
   while(1){
     while((res2 = read(info->fd, &buf2, 1))==0)
       continue;
@@ -62,7 +62,7 @@ int readFrame(char * frame){
 
     //start_alarm();
 
-    printf("0x%02x ", buf2);
+    //printf("0x%02x ", buf2);
     
 
     if (buf2 == F){
@@ -95,7 +95,7 @@ int readFrame(char * frame){
     i++;
   }
 
-  printf("\n");
+  //printf("\n");
   return i;
 }
 
@@ -148,6 +148,7 @@ int verifyFrame(char * frame, int length, char * type){
 
     if (type != "I0" && type != "I1"){
       if (length != 5){
+        info->lostPack++;
         printf("frame do tipo %s com tamanho irregular = %d \n", type, length);
         return 0;
       }
@@ -160,8 +161,8 @@ int verifyFrame(char * frame, int length, char * type){
       }
       else if (i == (length - 2)){
         if (frame[i] != BBC2){
-
-          printf("\n\n\n\nBCC2 devia ser 0x%02x, mas é 0x%02x\n\n\n\n\n", BBC2, frame[i]);
+	  info->lostPack++;
+          //printf("\n\n\n\nBCC2 devia ser 0x%02x, mas é 0x%02x\n\n\n\n\n", BBC2, frame[i]);
           return 0;
         }
       }
@@ -180,6 +181,7 @@ int verifyFrame(char * frame, int length, char * type){
     return 1;
   }
   else{
+    info->lostPack++;
     estado = START;
     return 0;
   }
@@ -250,12 +252,12 @@ char * comporTramaI(int flag, char * buffer, int length){
     printf("\n");
   */
   info->frameSendLength = 6+length;
-  fprintf(stderr,"Construida ");
-  int i;
+  //fprintf(stderr,"Construida ");
+ /* int i;
   for(i = 0; i < info->frameSendLength; i++){
     fprintf(stderr,"0x%x ", info->frameSend[i]);
   }
-  fprintf(stderr,"\n");
+  fprintf(stderr,"\n");*/
   return info->frameSend;
 }
 
@@ -268,7 +270,7 @@ int llopen(char * porta, int flag){
   info->frameSend = malloc(255);
   info->timeout = 3;
   install_handler(atende, info->timeout);
-  printf("sequenceNumber: %d \n", info->sequenceNumber);
+  //printf("sequenceNumber: %d \n", info->sequenceNumber);
   info->tentativas = 3;
   info->flag = flag;
 
@@ -306,7 +308,7 @@ int llopen(char * porta, int flag){
     buildFrame(flag, "set");
     transmitirFrame(info->frameSend, info->frameSendLength);
     while(info->tentativas > 0){
-      printf("tentativasOpen = %d \n", info->tentativas);
+      //printf("tentativasOpen = %d \n", info->tentativas);
       start_alarm();
       info->frameTempLength = readFrame(info->frameTemp);
       if (verifyFrame(info->frameTemp, info->frameTempLength, "ua")){
@@ -322,7 +324,7 @@ int llopen(char * porta, int flag){
     if (verifyFrame(info->frameTemp, info->frameTempLength, "set")){
       buildFrame(flag, "ua");
       transmitirFrame(info->frameSend, info->frameSendLength);
-      printf("terminar llopen recetor \n");
+      //printf("terminar llopen recetor \n");
       return 1;
     }
   }
@@ -336,40 +338,40 @@ int llwrite(int fd, char * buffer, int length){
   stuffing(info->frameSend, &info->frameSendLength);
   //printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
   transmitirFrame(info->frameSend, info->frameSendLength);
-  printf("enviar frame I com sequenceNumber = %d \n", info->sequenceNumber);
+  //printf("enviar frame I com sequenceNumber = %d \n", info->sequenceNumber);
   info->tentativas = info->timeout;
   while(info->tentativas > 0){
     start_alarm();
     info->frameTempLength = readFrame(info->frameTemp);
     if (info->sequenceNumber == 1){
       if (verifyFrame(info->frameTemp, info->frameTempLength, "rr0")){
-        printf("recebeu rr corretamente \n");
+        //printf("recebeu rr corretamente \n");
         stop_alarm();
         info->tentativas = info->timeout;
         break;
       }
       else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej0")){
-        printf("recebeu rej0\n");
+        //printf("recebeu rej0\n");
         transmitirFrame(info->frameSend, info->frameSendLength);
         continue;
       }
     }
     else if (info->sequenceNumber == 0){
       if (verifyFrame(info->frameTemp, info->frameTempLength, "rr1")){
-        printf("recebeu rr corretamente \n");
+        //printf("recebeu rr corretamente \n");
         stop_alarm();
         info->tentativas = info->timeout;
         break;
       }
       else if (verifyFrame(info->frameTemp, info->frameTempLength, "rej1")){
-        printf("recebeu rej1\n");
+        //printf("recebeu rej1\n");
         transmitirFrame(info->frameSend, info->frameSendLength);
         continue;
       }
     }
   }
   info->sequenceNumber = !info->sequenceNumber;
-  printf("retornar llwrite\n");
+  //printf("retornar llwrite\n");
   return 1;
 }
 
@@ -387,20 +389,20 @@ int llread(int fd, char * buffer){
     }
     else if (type == "I0" || type == "I1"){
       destuffing(info->frameTemp, &info->frameTempLength);
-        fprintf(stderr,"Destuffing ");
-        int bb;
+        //fprintf(stderr,"Destuffing ");
+        /*int bb;
         for(bb = 0; bb < info->frameTempLength; bb++){
           fprintf(stderr,"0x%x ", info->frameTemp[bb]);
         }
-        fprintf(stderr,"\n");
+        fprintf(stderr,"\n");*/
       if (verifyFrame(info->frameTemp, info->frameTempLength, type)){
 
         if(type == "I0" && !info->sequenceNumber
           || type == "I1" && info->sequenceNumber){
-          printf("recebeu a trama I correspondente aos sequenceNumber %d \n", info->sequenceNumber);
+          //printf("recebeu a trama I correspondente aos sequenceNumber %d \n", info->sequenceNumber);
           char * typeRR = malloc(5);
           sprintf(typeRR, "rr%d", !info->sequenceNumber);
-          printf("criar frame de %s \n", typeRR);
+          //printf("criar frame de %s \n", typeRR);
           buildFrame(info->flag, typeRR);
           transmitirFrame(info->frameSend, info->frameSendLength);
           free(typeRR);
@@ -409,7 +411,7 @@ int llread(int fd, char * buffer){
         else{
           char * typeRR = malloc(5);
           sprintf(typeRR, "rr%d", info->sequenceNumber);
-          printf("criar frame de %s \n", typeRR);
+          //printf("criar frame de %s \n", typeRR);
           buildFrame(info->flag, typeRR);
           transmitirFrame(info->frameSend, info->frameSendLength);
           free(typeRR);
@@ -417,26 +419,27 @@ int llread(int fd, char * buffer){
         }
 
         int j;
-        printf("frameTempLength: %d\n", info->frameTempLength);
-         printf("dados recebidos: ");
+        //printf("frameTempLength: %d\n", info->frameTempLength);
+        //printf("dados recebidos: ");
         
 
         for(j = 0; j < (info->frameTempLength-6); j++){
           info->dados[j] = info->frameTemp[4+j];
-          printf(" %x ", info->dados[j]);
+          //printf(" %x ", info->dados[j]);
           buffer[j] = info->dados[j];
           //printf(" %x \n", info->dados[j]);
         }
-        printf("\n");
+        //printf("\n");
         info->lengthDados = j;
       }
       else{
         char * typeREJ = malloc(5);
         sprintf(typeREJ, "rej%d", !info->sequenceNumber);
-        printf("criar frame de %s \n", typeREJ);
+        //printf("criar frame de %s \n", typeREJ);
         buildFrame(info->flag, typeREJ);
         transmitirFrame(info->frameSend, info->frameSendLength);
         free(typeREJ);
+	continue;
       }
     }
     break;
@@ -484,24 +487,24 @@ int llclose_receiver(int fd){
       if (verifyFrame(info->frameTemp, info->frameTempLength, type)){
         char * typeRR = malloc(5);
         sprintf(typeRR, "rr%d", !info->sequenceNumber);
-        printf("criar frame de %s \n", typeRR);
+        //printf("criar frame de %s \n", typeRR);
         buildFrame(info->flag, typeRR);
         transmitirFrame(info->frameSend, info->frameSendLength);
         free(typeRR);
         int j;
-        printf("dados recebidos: ");
+        //printf("dados recebidos: ");
         for(j = 0; j < (info->frameTempLength-6); j++){
           info->dados[j] = info->frameTemp[4+j];
-          printf(" %x ", info->dados[j]);
+          //printf(" %x ", info->dados[j]);
         }
-        printf("\n");
+        //printf("\n");
         info->lengthDados = j;
         continue;
       }
       else{
         char * typeREJ = malloc(5);
         sprintf(typeREJ, "rej%d", !info->sequenceNumber);
-        printf("criar frame de %s \n", typeREJ);
+        //printf("criar frame de %s \n", typeREJ);
         buildFrame(info->flag, typeREJ);
         transmitirFrame(info->frameSend, info->frameSendLength);
         free(typeREJ);
@@ -537,14 +540,14 @@ int llclose_receiver(int fd){
 
 int transmitirFrame(char * frame, int length){
   int i;
-  fprintf(stderr, "Enviar frame tamanho %d : ", length);
+  //fprintf(stderr, "Enviar frame tamanho %d : ", length);
   for(i = 0; i < length; i++){
     res = write(info->fd,&frame[i],1);
     if (res == 0 || res == -1)
       return 0;
-    fprintf(stderr,"0x%x ", frame[i]);
+    //fprintf(stderr,"0x%x ", frame[i]);
   }
-  fprintf(stderr,"\n");
+  //fprintf(stderr,"\n");
   return 1;
 }
 
@@ -635,7 +638,7 @@ int campo_endereco(int role, int c){
     }
   }
 
-  printf("fail no campo_endereco \n");
+  //printf("fail no campo_endereco \n");
 }
 
 int Is_cmd(int comand){
@@ -723,11 +726,7 @@ void destuffing(unsigned char* frame, unsigned int* size){
       memmove(frame + i + 1, frame + i + 2, *size-i-2);
       //frame[i] = 0x7d;
      (*size)--;
-     printf("SIZE  DSF: %x\n", frame[i+1]);
-     printf("SIZE  DSF: %d\n", *size);
-       printf("i  DSF: %d\n", i);
     }
 
   }
-   printf("SAIU DO FOR!!!!!\n");
 }
