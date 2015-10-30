@@ -377,7 +377,7 @@ int llwrite(int fd, char * buffer, int length){
 
 int llread(int fd, char * buffer){
 
-  printf("iniciar llread \n");
+  //printf("iniciar llread \n");
   while(1){
     info->frameTempLength = readFrame(info->frameTemp);
     char * type = NULL;

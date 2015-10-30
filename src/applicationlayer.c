@@ -122,7 +122,7 @@ int app_layer_transmitter(){
 
 		int llw = llwrite(appLayer->fd, appLayer->buf,datalength);
 
-		printf("Percentagem de dados enviados: %f  %\n", ((float)i*appLayer->numDataPack)/100);
+		printf("Percentagem de dados enviados: %f \n", ((float)x*100)/appLayer->numDataPack);
 	
 		appLayer->seqNumb++;
 		//if(suc != 0)
@@ -191,7 +191,7 @@ int app_layer_receiver(){
 			x--;
 			continue;
 		}
-		printf("Percentagem de dados recebidos: %f  %\n", ((float)x*appLayer->numDataPack)/100);
+		printf("Percentagem de dados recebidos: %3f \n", ((float)x*100)/appLayer->numDataPack);
 		//printf("escrever no ficherio\n\n\n\n");
 		while(!writeToFile(appLayer->dados))
 			continue;
