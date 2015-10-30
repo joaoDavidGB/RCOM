@@ -127,6 +127,7 @@ int app_layer_transmitter(){
 	}
 
 	int n2 = makeCONTROLpackage(appLayer->buf,2);
+	llwrite(appLayer->fd, appLayer->buf,n2);
 
 
 	int llc = llclose_transmitter(appLayer->fd);
