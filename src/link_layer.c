@@ -317,7 +317,7 @@ int llopen(char * porta, int flag){
 
 int llwrite(int fd, char * buffer, int length){
   
-  comporTramaI(TRANSMITTER, buffer, info->lengthDados);
+  comporTramaI(TRANSMITTER, buffer, length);
   stuffing(info->frameSend, &info->frameSendLength);
   //printf("partes: %x, %x, %x, %x, %x, %x, %x, %x, %x \n", tramaI[0],tramaI[1],tramaI[2],tramaI[3],tramaI[4],tramaI[5],tramaI[6],tramaI[7],tramaI[8]);
   transmitirFrame(info->frameSend, info->frameSendLength);
