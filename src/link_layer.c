@@ -156,6 +156,7 @@ int verifyFrame(char * frame, int length, char * type){
       }
       else if (i == (length - 2)){
         if (frame[i] != BBC2){
+          printf("\n\n\n\nBCC2-------------------\n\n\n\n\n");
           return 0;
         }
       }
