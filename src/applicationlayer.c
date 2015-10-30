@@ -288,7 +288,7 @@ char* processBuf(unsigned char seqnumb){
 		return 0;
 
 	if(appLayer->buf[1] != seqnumb){
-		printf("rip seqnumb\n");
+		printf("rip seqnumb. buf[1] = 0x%x em vez de seqnumb = 0x%x\n", appLayer->buf[1], seqnumb);
 		return "rip";
 	}
 
