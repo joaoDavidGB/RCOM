@@ -81,7 +81,7 @@ int app_layer_transmitter(){
  	appLayer->lengthDados = (MAX_FRAME_SIZE - 2 - 8 -4)/2; 
  	appLayer->numDataPack = (int)(((float)appLayer->filesize)/appLayer->lengthDados+.5);
 
-	appLayer->buf = malloc(100); //escrevemos sempre no mesmo buffer ele é sempre reescrito
+	appLayer->buf = malloc(1000); //escrevemos sempre no mesmo buffer ele é sempre reescrito
 	int n1 = makeCONTROLpackage(appLayer->buf,1);
 	
 
