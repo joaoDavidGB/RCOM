@@ -146,6 +146,7 @@ int app_layer_transmitter(){
 int app_layer_receiver(){
 	int llo = llopen(appLayer->porta, RECEIVER);
 	appLayer->dados = malloc(150);
+	appLayer->filename = malloc(150);
 
 	
 	llread(RECEIVER, appLayer->buf);
