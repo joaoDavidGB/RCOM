@@ -267,8 +267,9 @@ int makeDATApackage(char* buf,int seqNumb, int lengthDados, char* dados){
 int writeToFile(char* dados){
 
 	int res = write(appLayer->fd, dados,  256 * appLayer->buf[2] + appLayer->buf[3]);
+	printf("Writing to ficherio %d\n", 256 * appLayer->buf[2] + appLayer->buf[3]);
 	write(STDIN_FILENO, dados,  256 * appLayer->buf[2] + appLayer->buf[3]);
-	printf("\n");
+	printf("\ndone writing to ficherio\n");
 	if(res == 0)
 		return 0;
 
