@@ -576,7 +576,7 @@ void state_machine(int state, char signal, char * type){
         }
         estado = state;
        
-        printf("estado: %d \n", estado);
+        //printf("estado: %d \n", estado);
 }
 
 int campo_endereco(int role, int c){
