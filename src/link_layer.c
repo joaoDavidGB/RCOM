@@ -61,7 +61,7 @@ int readFrame(char * frame){
 
     //start_alarm();
 
-    printf("Received[%d]: %x !!! %d \n", i, buf2, res2);
+    //printf("Received[%d]: %x !!! %d \n", i, buf2, res2);
     
 
     if (buf2 == F){
@@ -205,7 +205,7 @@ int buildFrame(int flag, char * type){
   info->frameSend[4] = F;
   info->frameSendLength = 5;
 
-  printf("Trama composta %s: 0x%x 0x%x 0x%x 0x%x 0x%x \n", type, info->frameSend[0], info->frameSend[1], info->frameSend[2], info->frameSend[3], info->frameSend[4]);
+  //printf("Trama composta %s: 0x%x 0x%x 0x%x 0x%x 0x%x \n", type, info->frameSend[0], info->frameSend[1], info->frameSend[2], info->frameSend[3], info->frameSend[4]);
   
   return 1;
 }
@@ -383,9 +383,9 @@ int llread(int fd, char * buffer){
 
         for(j = 0; j < (info->frameTempLength-6); j++){
           info->dados[j] = info->frameTemp[4+j];
-          printf(" %x \n", info->dados[j]);
+          printf(" %x ", info->dados[j]);
           buffer[j] = info->dados[j];
-           printf(" %x \n", info->dados[j]);
+          //printf(" %x \n", info->dados[j]);
         }
         printf("blee\n");
         info->lengthDados = j;
