@@ -250,6 +250,12 @@ char * comporTramaI(int flag, char * buffer, int length){
     printf("\n");
   */
   info->frameSendLength = 6+length;
+  fprintf(stderr,"Construida ");
+  int i;
+  for(i = 0; i < info->frameSendLength; i++){
+    fprintf(stderr,"0x%x ", info->frameSend[i]);
+  }
+  fprintf(stderr,"\n");
   return info->frameSend;
 }
 
@@ -681,16 +687,16 @@ void stuffing(unsigned char* frame, unsigned int* size){
   for (i = 1; i < (*size-1); i++){
       if (frame[i] == 0x7e){
 
-        memmove(frame + i + 2,frame + i + 1,*size-i-1); 
+        memmove(frame + i + 1,frame + i ,*size-i); 
         frame[i] = 0x7d;
-        frame[i++] = 0x5e;
+        frame[++i] = 0x5e;
         (*size)++;
       } 
       else if (frame[i] == 0x7d){
         
-        memmove(frame + i + 2,frame + i + 1,*size-i-1); 
+        memmove(frame + i + 1,frame + i ,*size-i); 
         frame[i] = 0x7d;
-        frame[i++] = 0x5d;
+        frame[++i] = 0x5d;
         (*size)++;
       }
   }
@@ -700,13 +706,13 @@ void stuffing(unsigned char* frame, unsigned int* size){
 void destuffing(unsigned char* frame, unsigned int* size){
   int i;
   for (i = 1; i < (*size-1); i++){
-    if(frame[i] == 0x7d && frame[i++] == 0x5e){
+    if(frame[i] == 0x7d && frame[++i] == 0x5e){
       
        memmove(frame + i + 1, frame + i + 2, *size-i-1);
        frame[i] = 0x7e;
       (*size--);
     }
-    else if (frame[i] == 0x7d && frame[i++]== 0x5d){
+    else if (frame[i] == 0x7d && frame[++i]== 0x5d){
       
       memmove(frame + i + 1, frame + i + 2, *size-i-1);
       frame[i] = 0x7d;
