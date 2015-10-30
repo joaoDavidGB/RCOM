@@ -317,6 +317,10 @@ int llopen(char * porta, int flag){
         return 1;
       }
     }
+    if (info->tentativas == 0){
+	printf("Número de tentativas chegou ao fim. \n");
+	exit(-1);
+    }
   }
   else{
     printf("llopen de recetor \n");
@@ -470,6 +474,10 @@ int llclose_transmitter(int fd){
     }  
   }
 
+  if (info->tentativas == 0){
+	printf("Número de tentativas chegou ao fim. \n");
+	exit(-1);
+  }
 
     if ( tcsetattr(info->fd,TCSANOW,&info->oldtio) == -1) {
       perror("tcsetattr");
