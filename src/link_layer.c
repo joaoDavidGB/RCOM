@@ -712,15 +712,15 @@ void stuffing(unsigned char* frame, unsigned int* size){
 void destuffing(unsigned char* frame, unsigned int* size){
   int i;
   for (i = 1; i < (*size-1); i++){
-    if(frame[i] == 0x7d && frame[++i] == 0x5e){
+    if(frame[i] == 0x7d && frame[i+1] == 0x5e){
       
-       memmove(frame + i, frame + i + 1, *size-i);
+       memmove(frame + i + 1, frame + i + 2, *size-i-1);
        frame[i] = 0x7e;
       (*size--);
     }
-    else if (frame[i] == 0x7d && frame[++i]== 0x5d){
+    else if (frame[i] == 0x7d && frame[i+1]== 0x5d){
       
-      memmove(frame + i , frame + i + 1, *size-i);
+      memmove(frame + i + 1, frame + i + 2, *size-i-1);
       frame[i] = 0x7d;
      (*size--);
     }
