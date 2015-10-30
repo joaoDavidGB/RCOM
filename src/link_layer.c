@@ -52,6 +52,7 @@ int readFrame(char * frame){
   int i = 0;
   int j = 0;
   int primeiroF = 1; //passa a 0 assim que a primeira FLAG é encontrada
+  printf("Received: ");
   while(1){
     while((res2 = read(info->fd, &buf2, 1))==0)
       continue;
@@ -61,7 +62,7 @@ int readFrame(char * frame){
 
     //start_alarm();
 
-    //printf("Received[%d]: %x !!! %d \n", i, buf2, res2);
+    printf(" %x ", buf2);
     
 
     if (buf2 == F){
@@ -92,6 +93,8 @@ int readFrame(char * frame){
 
     i++;
   }
+
+  printf("\n");
   return i;
 }
 
