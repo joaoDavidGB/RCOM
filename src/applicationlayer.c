@@ -15,7 +15,7 @@ int main(int argc, char** argv){
 		return 0;
 	}
 	appLayer = malloc(sizeof(struct applicationLayer));
-	appLayer->flag = atoi(argv[3]);
+	appLayer->flag = atoi(argv[2]);
 	appLayer->porta = argv[1];
 	appLayer->buf = malloc(1000); //escrevemos sempre no mesmo buffer ele é sempre reescrito
 
