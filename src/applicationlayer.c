@@ -241,7 +241,7 @@ int makeCONTROLpackage(char* buf,int c){
 	buf[4+sizeof(appLayer->filesize)] = sizeof(appLayer->filename);
 	memcpy(buf + 4+sizeof(appLayer->filesize), &appLayer->filename, strlen(appLayer->filename));
 
-	return buf + 4+sizeof(appLayer->filesize)+strlen(appLayer->filename);
+	return 4+sizeof(appLayer->filesize)+strlen(appLayer->filename);
 }
 
 // Cria data package que envia o ficheiro
