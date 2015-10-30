@@ -286,7 +286,7 @@ char* processBuf(unsigned char seqnumb){
 
 	if(appLayer->buf[1] != seqnumb){
 		printf("rip seqnumb\n");
-		return 0;
+		//return 0;
 	}
 
 	char * bf = malloc(150);

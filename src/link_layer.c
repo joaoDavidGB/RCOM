@@ -212,14 +212,14 @@ int buildFrame(int flag, char * type){
 }
 
 char * comporTramaI(int flag, char * buffer, int length){
-/*
-  int ecx = 0;
-  
-  printf("tamanho dos dados a enviar: %d \n Dados: ", length);
-  for(ecx = 0; ecx < length; ecx++){
-    printf("%x.", buffer[ecx]);
-  }
-  printf("\n");
+  /*
+    int ecx = 0;
+    
+    printf("tamanho dos dados a enviar: %d \n Dados: ", length);
+    for(ecx = 0; ecx < length; ecx++){
+      printf("%x.", buffer[ecx]);
+    }
+    printf("\n");
   */
 
   int index;
@@ -237,12 +237,12 @@ char * comporTramaI(int flag, char * buffer, int length){
     info->frameSend[4 + length] = info->frameSend[4 + length]^info->frameSend[4 + index];
   }
   info->frameSend[4 + length + 1] = F;
-/*
-  int i;
-  for(i = 0; i <= (5+length); i++){
-    printf("I[%d]=%x ", i, info->frameSend[i]);
-  }
-  printf("\n");
+  /*
+    int i;
+    for(i = 0; i <= (5+length); i++){
+      printf("I[%d]=%x ", i, info->frameSend[i]);
+    }
+    printf("\n");
   */
   info->frameSendLength = 6+length;
   return info->frameSend;
@@ -365,7 +365,7 @@ int llread(int fd, char * buffer){
   printf("iniciar llread \n");
   while(1){
     info->frameTempLength = readFrame(info->frameTemp);
-    char * type = malloc(5);
+    char * type = NULL;
     type = verifyFrameType(info->frameTemp);
     if (type == "set"){
       buildFrame(info->flag, "ua");
@@ -375,15 +375,31 @@ int llread(int fd, char * buffer){
     else if (type == "I0" || type == "I1"){
       destuffing(info->frameTemp, &info->frameTempLength);
       if (verifyFrame(info->frameTemp, info->frameTempLength, type)){
-        char * typeRR = malloc(5);
-        sprintf(typeRR, "rr%d", !info->sequenceNumber);
-        printf("criar frame de %s \n", typeRR);
-        buildFrame(info->flag, typeRR);
-        transmitirFrame(info->frameSend, info->frameSendLength);
-        free(typeRR);
+
+        if(type == "I0" && !info->sequenceNumber
+          || type == "I1" && info->sequenceNumber){
+          char * typeRR = malloc(5);
+          sprintf(typeRR, "rr%d", !info->sequenceNumber);
+          printf("criar frame de %s \n", typeRR);
+          buildFrame(info->flag, typeRR);
+          transmitirFrame(info->frameSend, info->frameSendLength);
+          free(typeRR);
+          info->sequenceNumber = !info->sequenceNumber;
+        }
+        else{
+          char * typeRR = malloc(5);
+          sprintf(typeRR, "rr%d", info->sequenceNumber);
+          printf("criar frame de %s \n", typeRR);
+          buildFrame(info->flag, typeRR);
+          transmitirFrame(info->frameSend, info->frameSendLength);
+          free(typeRR);
+          continue;
+        }
+
         int j;
         printf("frameTempLength: %d\n", info->frameTempLength);
          printf("dados recebidos: ");
+        
 
         for(j = 0; j < (info->frameTempLength-6); j++){
           info->dados[j] = info->frameTemp[4+j];
