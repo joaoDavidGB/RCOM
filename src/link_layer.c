@@ -1,47 +1,6 @@
 #include "link_layer.h"
 
 int estado = START;
-/*
-int main(int argc, char** argv){
-  info = malloc(sizeof(struct Info));
-  info->sequenceNumber = atoi(argv[3]);
-  info->dados = malloc(255);
-  info->frameTemp = malloc(255);
-  info->frameSend = malloc(255);
-  info->timeout = 3;
-  install_handler(atende, info->timeout);
-  printf("sequenceNumber: %d \n", info->sequenceNumber);
-  info->tentativas = 3;
-  char * type = malloc(5);
-  int concluido = 0;
-
-  if (strcmp("0", argv[1])==0){       //RECEIVER
-    info->flag = RECEIVER;
-    llopen(atoi(argv[2]), RECEIVER);
-    llread(info->fd, info->dados);
-    llclose_receiver(info->fd);
-  }
-  else if (strcmp("1", argv[1])==0){      //Transmitter
-    info->flag = TRANSMITTER;
-    llopen(atoi(argv[2]), TRANSMITTER);
-    int i;
-    for(i = 0; i < 6; i++){
-      info->dados[i] = i*10;
-      printf("dados[%d] = %x \n", i, info->dados[i]);
-    }
-    info->lengthDados = 6;
-    llwrite(info->fd, info->dados, info->lengthDados);
-    llclose_transmitter(info->fd);
-  }
-
-
-  free(type);
-  stop_alarm();
-  info->tentativas = 3;
-
-  return 1;
-}
-*/
 
 /*
   Lê uma frame para o parametro "frame" e retorna o tamanho da frame
