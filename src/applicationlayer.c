@@ -62,34 +62,6 @@ int main(int argc, char** argv){
 	else if (appLayer->flag == RECEIVER)
 		app_layer_receiver();
 	
- 	//porta = argv[1]; //estou a passar a porta como argumento.... 
-
-	
-	/*
-	for(i=0; i<=numDataPack ; i++){
-		int res;
-		fprintf(stderr, "lengthDados = %d \n", appLayer->lengthDados);
-
-		do{res = read(appLayer->fd, dados, appLayer->lengthDados); }while(res == 0); //CONFIRMAR SE ESTA A LER PARA OS DADOS!!!!!
-			
-
-		fprintf(stderr, "Dados = %s | res = %d \n", dados, res);
-
-		int suc = makeDATApackage(appLayer->buf, seqNumb, res, dados);
-
-		writeToFile(dados, appLayer->buf);
-
-
-		//if(suc != 0)
-			//return 0;
-	}
-	*/
-/*
-	int n2 = makeCONTROLpackage(buf,2);
-
-	if(n2!=0)
-		return 0;
-*/
 	free(appLayer->buf);
 	free(appLayer);
 
@@ -102,7 +74,6 @@ int app_layer_transmitter(){
  		return 0;
 
 	printf("ficheiro aberto: %s \n", appLayer->filename);
-	//printf("LEU O FICHEIRO!\n");
 
 	struct stat fileStat;
 
@@ -116,8 +87,6 @@ int app_layer_transmitter(){
  		printf("Erro no file size\n");
  		return 0;
  	}
-
- 	//printf("file size: %d\n", appLayer->filesize);
 
  	appLayer->lengthDados = (Max_Frame_Size - 2 - 8 -4)/2; 
  	appLayer->numDataPack = (int)(((float)appLayer->filesize)/appLayer->lengthDados+.5);
@@ -137,19 +106,14 @@ int app_layer_transmitter(){
 	llopen....
 	*/
 
-	 int llo = llopen(appLayer->porta, TRANSMITTER);
+	int llo = llopen(appLayer->porta, TRANSMITTER);
 	
 	llwrite(1, appLayer->buf, n1);
-	//printf("enviou o crtlPacket");
 
 	for(i=0; i <= appLayer->numDataPack ; i++){
 		int res;
-		//fprintf(stderr, "lengthDados = %d \n", appLayer->lengthDados);
 
-		do{res = read(appLayer->fd, dados, appLayer->lengthDados); }while(res == 0); //CONFIRMAR SE ESTA A LER PARA OS DADOS!!!!!
-
-
-		//fprintf(stderr, "\n\n\n\n\nDados = %s | res = %d \n", dados, res);
+		do{res = read(appLayer->fd, dados, appLayer->lengthDados); }while(res == 0); 
 
 		int datalength = makeDATApackage(appLayer->buf, appLayer->seqNumb, res, dados);
 
@@ -164,8 +128,6 @@ int app_layer_transmitter(){
 		printf("Percentagem de dados enviados: %f \n", ((float)i*100)/appLayer->numDataPack);
 	
 		appLayer->seqNumb++;
-		//if(suc != 0)
-			//return 0;
 	}
 
 	int n2 = makeCONTROLpackage(appLayer->buf,2);
@@ -246,24 +208,6 @@ int app_layer_receiver(){
 	else{
 		//printf("ultimo pacote lido\n");
 	}
-
-
-
-/*
-	int j = 1; 
-	int ite = 0;
-	for(ite = 0; ite < 2; ite++){
-		if (appLayer[j] == 0){
-			int octSize = appLayer[j+1];
-			memcpy(appLayer->filesize, &appLayer+(j+2), octSize);
-		}
-		else if (appLayer[j] == 1){
-			int octSize = appLayer[j+1];
-			memcpy(appLayer->filename, &appLayer+(j+2), octSize);
-		}
-		j+= 1+octSize;
-	}
-*/
 
 
 	int llc = llclose_receiver(appLayer->fd);
@@ -362,23 +306,16 @@ int changeSettings(){
 	int timeOutC;
 	int baudRateC;
 	int max_size; 
-	//printf("File: ");
-	//scanf("%s", fileC);
 
-	//appLayer->filename = fileC; //Nome do ficheiro perguntado no menu 
 	printf("tentativas: ");
 	scanf("%d", &tentativasC);
-
 
 	printf("timeOut: ");
 	scanf("%d", &timeOutC);
 
-
 	printf("BaudRate: ");
 	scanf("%d", &baudRateC);
 	
-
-
 	printf("Max_Frame_Size: ");
 	scanf("%d", &max_size);
 
